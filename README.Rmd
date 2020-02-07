@@ -45,7 +45,7 @@ devtools::install_github("tpgarcia/stride", force=TRUE)
 
 This is a basic example which shows you how to solve a common problem:
 
-```{r example}
+```{r example, results="hide", message=FALSE}
 library(stride)
 
 # Setup parameters to generate the data
@@ -87,7 +87,7 @@ ww <- data.gen$ww
 zz <- data.gen$zz
 
 
-## true group membership (needed to compute the AUC/BS for simulated data
+## true group membership (needed to compute the AUC/BS for simulated data)
 true.groups <- data.gen$true.groups
 
 ## Perform the estimation			

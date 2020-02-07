@@ -81,7 +81,7 @@ ww <- data.gen$ww
 zz <- data.gen$zz
 
 
-## true group membership (needed to compute the AUC/BS for simulated data
+## true group membership (needed to compute the AUC/BS for simulated data)
 true.groups <- data.gen$true.groups
 
 ## Perform the estimation			
