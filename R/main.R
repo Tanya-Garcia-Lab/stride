@@ -9,7 +9,7 @@
 ####################################
 ####################################
 
-landmix.estimator.wrapper <- function(
+stride.estimator.wrapper <- function(
   n,m,p,qvs,q,
   x,delta,ww,zz,
   run.NPMLEs,
@@ -301,7 +301,7 @@ common_error_messages <- function(n,m,p,qvs,q,
 #' Garcia, T.P. and Parast, L. (2019+). Dynamic landmark prediction for mixture data.
 #'
 #'
-#' @return \code{landmix.estimator} returns a list containing
+#' @return \code{stride.estimator} returns a list containing
 #' \itemize{
 #'    \item{problem: }{a numeric indicator of errors in the NPNA estimator. If NULL, no error is reported.
 #'    Otherwise, there is an error in the computation of the NPNA estimator.}
@@ -323,7 +323,7 @@ common_error_messages <- function(n,m,p,qvs,q,
 #'    \code{St.estimate} shows NA for any combination for which \eqn{t<t_0}.
 #'    }
 #'
-#'    \item{Ft.AUC.BS: }{a numeric array containing the 
+#'    \item{Ft.AUC.BS: }{a numeric array containing the
 #'    area under the receiver operating characteristic curve (AUC) and
 #'    Brier Score (BS) for the \code{p} populations. The dimension of the array is \# of methods by
 #'    \code{length(tval)} by \code{length(tval0)} by 2,
@@ -350,10 +350,10 @@ common_error_messages <- function(n,m,p,qvs,q,
 #'
 #' }
 #'
-#' @example man/examples/landmix_ex.R
+#' @example man/examples/stride_ex.R
 #'
 #' @export
-landmix.estimator <- function(n,m,p,qvs,q,
+stride.estimator <- function(n,m,p,qvs,q,
 				x,delta,ww,zz,
 				run.NPMLEs,
 				run.NPNA,
@@ -370,7 +370,7 @@ landmix.estimator <- function(n,m,p,qvs,q,
 	############################
 	## run the main procedure ##
 	############################
-	estimators.out <- landmix.estimator.wrapper(
+	estimators.out <- stride.estimator.wrapper(
 		n,m,p,qvs,q,
 		x,delta,ww,zz,
 		run.NPMLEs,
@@ -399,7 +399,7 @@ landmix.estimator <- function(n,m,p,qvs,q,
 		#############################
 		## only run prediction computation on simulated data
 		if(run.prediction.accuracy==TRUE & know.true.groups==TRUE){
-			prediction.out <- landmix.estimator.wrapper(
+			prediction.out <- stride.estimator.wrapper(
 						n,m,p,qvs,q,
 						x,delta,ww,zz,
 						run.NPMLEs,
@@ -476,9 +476,9 @@ landmix.estimator <- function(n,m,p,qvs,q,
 #' @param update.qs logical indicator. If TRUE, the mixture proportions \code{q} will be updated. This is currently not implemented.
 #' @param know.true.groups logical indicator. If TRUE, then we know the population identifier for each person in the sample.
 #' This option is only used for simulation studies. Default is FALSE.
-#' @param estimator_Ft a numeric array of the estimated distribution functions for all \code{p} populations. 
+#' @param estimator_Ft a numeric array of the estimated distribution functions for all \code{p} populations.
 #'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
-#'    \code{length(z.use)} by \code{length(w.use)} by \code{p}. 
+#'    \code{length(z.use)} by \code{length(w.use)} by \code{p}.
 #' 	Results are only valid when \eqn{t\geq t_0}, so arrays show NA for any combination for which \eqn{t<t_0}.
 #' @param estimator_St: a numeric array of the estimated distribution functions for all \code{m} mixture proportion groups.
 #'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
@@ -487,7 +487,7 @@ landmix.estimator <- function(n,m,p,qvs,q,
 #' @param AUC_BS_Ft a numeric array of the area under the receiver operating characteristic curve (AUC) and
 #'    Brier Score (BS) for the \code{p} populations. The dimension of the array is \# of methods by
 #'    \code{length(tval)} by \code{length(tval0)} by 2,
-#'    where the last dimension stores the AUC and BS results. 
+#'    where the last dimension stores the AUC and BS results.
 #' 	Results are only valid when \eqn{t\geq t_0}, so arrays show NA for any combination for which \eqn{t<t_0}.
 #' @param AUC_BS_St a numeric array of the area under the receiver operating characteristic curve (AUC) and
 #'    Brier Score (BS) for the \code{m} mixture proportion groups.
@@ -506,7 +506,7 @@ landmix.estimator <- function(n,m,p,qvs,q,
 #' area under the receiver operating characteristic curve (AUC) and the Brier Score (BS) using cross-validation. Prediction accuracy is only valid
 #' in simulation studies where \code{know.true.groups}=TRUE and \code{true.groups} is available.
 #'
-#' @return \code{landmix.bootstrap.variance} returns a list containing
+#' @return \code{stride.bootstrap.variance} returns a list containing
 #' \itemize{
 #'    \item{Ft.estimate.boot: }{a numeric array containing the estimated bootstrap variances,
 #'    the 2.5% bootstrap quantile, and the 97.5% bootstrap quantile for all methods
@@ -551,11 +551,11 @@ landmix.estimator <- function(n,m,p,qvs,q,
 #'
 #' }
 #'
-#' @example man/examples/landmix_ex.R
+#' @example man/examples/stride_ex.R
 #'
 #' @export
 #' @import stats
-landmix.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
+stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
                        x,delta,ww,zz,
                        run.NPMLEs,
                        run.NPNA,
@@ -623,14 +623,14 @@ landmix.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
                                     label.name.simus=paste("boot",1:nboot,sep=""))
   Sout.boot.out <- Sout.null.theta$null.theta.simus$estimator
   St.estimate.boot <- Sout.null.theta$null.theta.ci$estimator
-  
+
 
 
   ################################################
   ## setup output for storage: AUC, BS analysis ##
   ################################################
   method.label.AUCBS <- c(method.label,"NPNA-NPMLE1","NPNA-NPNA_wrong","NPMLE1-NPNA_avg")
-  
+
 
   AUC.BS.Ft.null.theta <- all.null.theta(theta.names=c("estimator","prediction"),
 							  first.label.name=method.label.AUCBS,
@@ -685,8 +685,8 @@ landmix.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
 	if(run.prediction.accuracy==TRUE){
 		predict.differences[1,method.label,,,] <- AUC_BS_Ft[method.label,,,]
 		Sout.predict.differences[1,method.label,,,] <- AUC_BS_St[method.label,,,]
-	  
-	  
+
+
 		if(run.NPMLEs==TRUE & run.NPNA==TRUE){
 			name1 <- "NPNA"
 			name2 <- "NPMLE1"
@@ -744,7 +744,7 @@ landmix.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
     ##################
     ## extract data ##
     ##################
-    estimators.out <- landmix.estimator(
+    estimators.out <- stride.estimator(
       n,m=m.boot,
       p,
       qvs=qvs.boot,
@@ -811,7 +811,7 @@ landmix.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
 
   get.my.variance <- function(theta.boot.out, theta.est){
     varest <- apply.index(theta.boot.out,"iters",var,na.rm=TRUE)
-    
+
 	##varlo <-  apply.index(theta.boot.out,"iters",myquantiles.lo)
     ##varhi <-  apply.index(theta.boot.out,"iters",myquantiles.hi)
 	varlo <- theta.est + qnorm(0.025)*sqrt(varest)
@@ -1537,7 +1537,7 @@ match.names <- function(qvs.boot,qvs){
 #' }
 #'
 #' @export
-#' @useDynLib landmix
+#' @useDynLib stride
 kincohort.estimators <- function(n,q,x,delta,
                                  t,qvs,p,m,r,
                                  boot,bootvar,
@@ -1597,7 +1597,7 @@ kincohort.estimators <- function(n,q,x,delta,
                   num_estimators,boot,bootvar,usetruth,useOLS,useWLS,useEFF,useNPMLEs,
                   hts0=hts0,
                   Fest=Fest,var_est=var_est,eflag=eflag,
-                  PACKAGE="landmix")
+                  PACKAGE="stride")
 
 
   ## UNCOMMENT FOR RUNNING CODE IN UNIX
