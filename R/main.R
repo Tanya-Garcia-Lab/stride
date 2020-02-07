@@ -50,7 +50,7 @@ stride.estimator.wrapper <- function(
                                 run.NPNA,
                                 run.NPNA_avg,
                                 run.NPNA_wrong
-                                )
+  )
 
   method.label <- est.names
 
@@ -83,13 +83,13 @@ stride.estimator.wrapper <- function(
   ####################
   data.out <- estimator.main(data,
                              n,p,m,r,qvs,
-							 tval,tval0,
+                             tval,tval0,
                              method.label,
                              z.use,w.use,
-							 update.qs,
+                             update.qs,
                              run.prediction.accuracy,
-							 do_cross_validation_AUC_BS
-							 )
+                             do_cross_validation_AUC_BS
+  )
 
   return(data.out)
 }
@@ -221,10 +221,10 @@ common_error_messages <- function(n,m,p,qvs,q,
   if(run.prediction.accuracy==TRUE){
     if(know.true.groups==FALSE | is.null(true.groups)){
       stop("To run prediction accuracy, user must set
-      know.true.groups=TRUE and provide true.groups.")
+           know.true.groups=TRUE and provide true.groups.")
     }
 
-  }
+    }
 
   if(!any(c(run.NPMLEs,run.NPNA,run.NPNA_avg,run.NPNA_wrong))){
     stop("No methods are set to run.")
@@ -354,77 +354,77 @@ common_error_messages <- function(n,m,p,qvs,q,
 #'
 #' @export
 stride.estimator <- function(n,m,p,qvs,q,
-				x,delta,ww,zz,
-				run.NPMLEs,
-				run.NPNA,
-				run.NPNA_avg,
-				run.NPNA_wrong,
-				tval,tval0,
-				z.use,w.use,
-				update.qs,
-				know.true.groups,
-				true.groups,
-				run.prediction.accuracy,
-				do_cross_validation_AUC_BS){
+                              x,delta,ww,zz,
+                              run.NPMLEs,
+                              run.NPNA,
+                              run.NPNA_avg,
+                              run.NPNA_wrong,
+                              tval,tval0,
+                              z.use,w.use,
+                              update.qs,
+                              know.true.groups,
+                              true.groups,
+                              run.prediction.accuracy,
+                              do_cross_validation_AUC_BS){
 
-	############################
-	## run the main procedure ##
-	############################
-	estimators.out <- stride.estimator.wrapper(
-		n,m,p,qvs,q,
-		x,delta,ww,zz,
-		run.NPMLEs,
-		run.NPNA,
-		run.NPNA_avg,
-		run.NPNA_wrong,
-		tval,tval0,
-		z.use,w.use,
-		update.qs,
-		know.true.groups,
-		true.groups,
-		run.prediction.accuracy=FALSE,
-		do_cross_validation_AUC_BS=FALSE
-	)
+  ############################
+  ## run the main procedure ##
+  ############################
+  estimators.out <- stride.estimator.wrapper(
+    n,m,p,qvs,q,
+    x,delta,ww,zz,
+    run.NPMLEs,
+    run.NPNA,
+    run.NPNA_avg,
+    run.NPNA_wrong,
+    tval,tval0,
+    z.use,w.use,
+    update.qs,
+    know.true.groups,
+    true.groups,
+    run.prediction.accuracy=FALSE,
+    do_cross_validation_AUC_BS=FALSE
+  )
 
-	## check if we have a problem with NPNA estimator.
-	Ft.estimate <- estimators.out$Ft.store
-	St.estimate <- estimators.out$Sout.store
-	Ft.AUC.BS <- NULL 	## place holder for now
-	St.AUC.BS <- NULL ## place holder for now
+  ## check if we have a problem with NPNA estimator.
+  Ft.estimate <- estimators.out$Ft.store
+  St.estimate <- estimators.out$Sout.store
+  Ft.AUC.BS <- NULL 	## place holder for now
+  St.AUC.BS <- NULL ## place holder for now
 
-	problem <- estimators.out$problem
-	if(is.null(problem)){
-		#############################
-		## get prediction accuracy ##
-		#############################
-		## only run prediction computation on simulated data
-		if(run.prediction.accuracy==TRUE & know.true.groups==TRUE){
-			prediction.out <- stride.estimator.wrapper(
-						n,m,p,qvs,q,
-						x,delta,ww,zz,
-						run.NPMLEs,
-						run.NPNA,
-						run.NPNA_avg,
-						run.NPNA_wrong,
-						tval,tval0,
-						z.use,w.use,
-						update.qs,
-						know.true.groups,
-						true.groups,
-						run.prediction.accuracy,
-						do_cross_validation_AUC_BS)
+  problem <- estimators.out$problem
+  if(is.null(problem)){
+    #############################
+    ## get prediction accuracy ##
+    #############################
+    ## only run prediction computation on simulated data
+    if(run.prediction.accuracy==TRUE & know.true.groups==TRUE){
+      prediction.out <- stride.estimator.wrapper(
+        n,m,p,qvs,q,
+        x,delta,ww,zz,
+        run.NPMLEs,
+        run.NPNA,
+        run.NPNA_avg,
+        run.NPNA_wrong,
+        tval,tval0,
+        z.use,w.use,
+        update.qs,
+        know.true.groups,
+        true.groups,
+        run.prediction.accuracy,
+        do_cross_validation_AUC_BS)
 
-			Ft.AUC.BS <- prediction.out$Ft.store
-			St.AUC.BS <- prediction.out$Sout.store
-		}
-	}
+      Ft.AUC.BS <- prediction.out$Ft.store
+      St.AUC.BS <- prediction.out$Sout.store
+    }
+  }
 
 
-	return(list(problem=problem,
-		 Ft.estimate=Ft.estimate,
-		 St.estimate=St.estimate,
-		 Ft.AUC.BS=Ft.AUC.BS,
-		 St.AUC.BS=St.AUC.BS))
+  return(list(problem=problem,
+              Ft.estimate=Ft.estimate,
+              St.estimate=St.estimate,
+              Ft.AUC.BS=Ft.AUC.BS,
+              St.AUC.BS=St.AUC.BS))
 }
 
 
@@ -480,7 +480,7 @@ stride.estimator <- function(n,m,p,qvs,q,
 #'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
 #'    \code{length(z.use)} by \code{length(w.use)} by \code{p}.
 #' 	Results are only valid when \eqn{t\geq t_0}, so arrays show NA for any combination for which \eqn{t<t_0}.
-#' @param estimator_St: a numeric array of the estimated distribution functions for all \code{m} mixture proportion groups.
+#' @param estimator_St a numeric array of the estimated distribution functions for all \code{m} mixture proportion groups.
 #'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
 #'    \code{length(z.use)} by \code{length(w.use)} by \code{m}.
 #' 	Results are only valid when \eqn{t\geq t_0}, so arrays show NA for any combination for which \eqn{t<t_0}.
@@ -539,7 +539,8 @@ stride.estimator <- function(n,m,p,qvs,q,
 #'    Brier Score (BS) for the \code{p} populations. The dimension of the array is \# of methods by
 #'    \code{length(tval)} by \code{length(tval0)} by 2 by 3. The second to last stores the AUC and BS results.
 #'	  The last dimension corresponds to the bootstrap variance estimate, 2.5% bootstrap quantile,
-#'    and the 97.5% bootstrap quantile.}
+#'    and the 97.5% bootstrap quantile.
+#'    }
 #'
 #'    \item {St.AUC.BS.boot: }{a numeric array containing the estimated bootstrap variances,
 #'    the 2.5% bootstrap quantile, and the 97.5% bootstrap quantile for all methods
@@ -547,7 +548,8 @@ stride.estimator <- function(n,m,p,qvs,q,
 #'    Brier Score (BS) for the \code{m} mixture proportion subgroups. The dimension of the array is \# of methods by
 #'    \code{length(tval)} by \code{length(tval0)} by 2 by 3. The second to last stores the AUC and BS results.
 #'	  The last dimension corresponds to the bootstrap variance estimate, 2.5% bootstrap quantile,
-#'    and the 97.5% bootstrap quantile.}
+#'    and the 97.5% bootstrap quantile.
+#'    }
 #'
 #' }
 #'
@@ -556,22 +558,22 @@ stride.estimator <- function(n,m,p,qvs,q,
 #' @export
 #' @import stats
 stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
-                       x,delta,ww,zz,
-                       run.NPMLEs,
-                       run.NPNA,
-                       run.NPNA_avg,
-                       run.NPNA_wrong,
-                       tval,tval0,
-                       z.use,w.use,
-                       update.qs,
-                       know.true.groups,
-                       true.groups,
-					   estimator_Ft,
-					   estimator_St,
-					   AUC_BS_Ft,
-					   AUC_BS_St,
-                       run.prediction.accuracy,
-					   do_cross_validation_AUC_BS){
+                                       x,delta,ww,zz,
+                                       run.NPMLEs,
+                                       run.NPNA,
+                                       run.NPNA_avg,
+                                       run.NPNA_wrong,
+                                       tval,tval0,
+                                       z.use,w.use,
+                                       update.qs,
+                                       know.true.groups,
+                                       true.groups,
+                                       estimator_Ft,
+                                       estimator_St,
+                                       AUC_BS_Ft,
+                                       AUC_BS_St,
+                                       run.prediction.accuracy,
+                                       do_cross_validation_AUC_BS){
 
 
   ###############################
@@ -633,28 +635,28 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
 
 
   AUC.BS.Ft.null.theta <- all.null.theta(theta.names=c("estimator","prediction"),
-							  first.label.name=method.label.AUCBS,
-							  tval,tval0,z.use,w.use,Ft.name="Ft",p,
-							  label.dim.simus=nboot,
-							  label.name.simus=paste("boot",1:nboot,sep=""))
+                                         first.label.name=method.label.AUCBS,
+                                         tval,tval0,z.use,w.use,Ft.name="Ft",p,
+                                         label.dim.simus=nboot,
+                                         label.name.simus=paste("boot",1:nboot,sep=""))
 
   predict.boot.out <- AUC.BS.Ft.null.theta$null.theta.simus$prediction
   Ft.AUC.BS.boot <- AUC.BS.Ft.null.theta$null.theta.ci$prediction
 
   AUC.BS.Sout.null.theta <- all.null.theta(theta.names=c("estimator","prediction"),
-							  first.label.name=method.label.AUCBS,
-							  tval,tval0,z.use,w.use,Ft.name="St",p=m,
-							  label.dim.simus=nboot,
-							  label.name.simus=paste("boot",1:nboot,sep=""))
+                                           first.label.name=method.label.AUCBS,
+                                           tval,tval0,z.use,w.use,Ft.name="St",p=m,
+                                           label.dim.simus=nboot,
+                                           label.name.simus=paste("boot",1:nboot,sep=""))
   Sout.predict.boot.out <- AUC.BS.Sout.null.theta$null.theta.simus$prediction
   St.AUC.BS.boot <- AUC.BS.Sout.null.theta$null.theta.ci$prediction
 
-	## function to compute AUC_BS differences between estimators
-	get_AUC_BS_differences <- function(bb,name1,name2,boot.out){
-		boot.out[bb,paste(name1,name2,sep="-"),,,] <-
-		boot.out[bb,name1,,,] - boot.out[bb,name2,,,]
-		return(boot.out)
-	}
+  ## function to compute AUC_BS differences between estimators
+  get_AUC_BS_differences <- function(bb,name1,name2,boot.out){
+    boot.out[bb,paste(name1,name2,sep="-"),,,] <-
+      boot.out[bb,name1,,,] - boot.out[bb,name2,,,]
+    return(boot.out)
+  }
 
 
 
@@ -664,55 +666,55 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
   ## create array to store estimators and differences ##
   ######################################################
   AUC.BS.Ft.null.theta.diff <- all.null.theta(theta.names=
-							  c("estimator","prediction"),
-							  first.label.name=method.label.AUCBS,
-							  tval,tval0,z.use,w.use,Ft.name="Ft",p,
-							  label.dim.simus=1,
-							  label.name.simus=paste("boot",1:1,sep=""))
+                                                c("estimator","prediction"),
+                                              first.label.name=method.label.AUCBS,
+                                              tval,tval0,z.use,w.use,Ft.name="Ft",p,
+                                              label.dim.simus=1,
+                                              label.name.simus=paste("boot",1:1,sep=""))
 
   predict.differences <- AUC.BS.Ft.null.theta.diff$null.theta.simus$prediction
 
   AUC.BS.Sout.null.theta.diff <- all.null.theta(theta.names=
-							  c("estimator","prediction"),
-							  first.label.name=method.label.AUCBS,
-							  tval,tval0,z.use,w.use,Ft.name="St",p=m,
-							  label.dim.simus=1,
-							  label.name.simus=paste("boot",1:1,sep=""))
+                                                  c("estimator","prediction"),
+                                                first.label.name=method.label.AUCBS,
+                                                tval,tval0,z.use,w.use,Ft.name="St",p=m,
+                                                label.dim.simus=1,
+                                                label.name.simus=paste("boot",1:1,sep=""))
   Sout.predict.differences <- AUC.BS.Sout.null.theta$null.theta.simus$prediction
 
 
   ## store in the results
-	if(run.prediction.accuracy==TRUE){
-		predict.differences[1,method.label,,,] <- AUC_BS_Ft[method.label,,,]
-		Sout.predict.differences[1,method.label,,,] <- AUC_BS_St[method.label,,,]
+  if(run.prediction.accuracy==TRUE){
+    predict.differences[1,method.label,,,] <- AUC_BS_Ft[method.label,,,]
+    Sout.predict.differences[1,method.label,,,] <- AUC_BS_St[method.label,,,]
 
 
-		if(run.NPMLEs==TRUE & run.NPNA==TRUE){
-			name1 <- "NPNA"
-			name2 <- "NPMLE1"
-			predict.differences <- get_AUC_BS_differences(1,name1,name2,predict.differences)
-			Sout.predict.differences <- get_AUC_BS_differences(1,name1,name2,Sout.predict.differences)
-		}
+    if(run.NPMLEs==TRUE & run.NPNA==TRUE){
+      name1 <- "NPNA"
+      name2 <- "NPMLE1"
+      predict.differences <- get_AUC_BS_differences(1,name1,name2,predict.differences)
+      Sout.predict.differences <- get_AUC_BS_differences(1,name1,name2,Sout.predict.differences)
+    }
 
-		if(run.NPMLEs==TRUE & run.NPNA_avg==TRUE){
-			name1 <- "NPMLE1"
-			name2 <- "NPNA_avg"
-			predict.differences <- get_AUC_BS_differences(1,name1,name2,predict.differences)
-			Sout.predict.differences <- get_AUC_BS_differences(1,name1,name2,Sout.predict.differences)
+    if(run.NPMLEs==TRUE & run.NPNA_avg==TRUE){
+      name1 <- "NPMLE1"
+      name2 <- "NPNA_avg"
+      predict.differences <- get_AUC_BS_differences(1,name1,name2,predict.differences)
+      Sout.predict.differences <- get_AUC_BS_differences(1,name1,name2,Sout.predict.differences)
 
-		}
+    }
 
-		if(run.NPNA==TRUE & run.NPNA_wrong==TRUE){
-			name1 <- "NPNA"
-			name2 <- "NPNA_wrong"
-			predict.differences <- get_AUC_BS_differences(1,name1,name2,predict.differences)
-			Sout.predict.differences <- get_AUC_BS_differences(1,name1,name2,Sout.predict.differences)
+    if(run.NPNA==TRUE & run.NPNA_wrong==TRUE){
+      name1 <- "NPNA"
+      name2 <- "NPNA_wrong"
+      predict.differences <- get_AUC_BS_differences(1,name1,name2,predict.differences)
+      Sout.predict.differences <- get_AUC_BS_differences(1,name1,name2,Sout.predict.differences)
 
-		}
+    }
 
-		predict.differences <- 	predict.differences[1,,,,]
-		Sout.predict.differences <- Sout.predict.differences[1,,,,]
-	}
+    predict.differences <- 	predict.differences[1,,,,]
+    Sout.predict.differences <- Sout.predict.differences[1,,,,]
+  }
   ###################
   ## run bootstrap ##
   ###################
@@ -763,7 +765,7 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
       know.true.groups,
       true.groups,
       run.prediction.accuracy,
-	  do_cross_validation_AUC_BS)
+      do_cross_validation_AUC_BS)
 
 
     ## check if we have a problem
@@ -773,36 +775,36 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
       Ft.boot.out[bb,,,,,,] <- estimators.out$Ft.estimate
       Sout.boot.out[bb,,,,,,] <- estimators.out$St.estimate
 
-	  if(run.prediction.accuracy==TRUE){
-		predict.boot.out[bb,method.label,,,] <- estimators.out$Ft.AUC.BS
-		Sout.predict.boot.out[bb,method.label,,,] <- estimators.out$St.AUC.BS
+      if(run.prediction.accuracy==TRUE){
+        predict.boot.out[bb,method.label,,,] <- estimators.out$Ft.AUC.BS
+        Sout.predict.boot.out[bb,method.label,,,] <- estimators.out$St.AUC.BS
 
 
-		if(run.NPMLEs==TRUE & run.NPNA==TRUE){
-			name1 <- "NPNA"
-			name2 <- "NPMLE1"
-			predict.boot.out <- get_AUC_BS_differences(bb,name1,name2,predict.boot.out)
-			Sout.predict.boot.out <- get_AUC_BS_differences(bb,name1,name2,Sout.predict.boot.out)
-		}
+        if(run.NPMLEs==TRUE & run.NPNA==TRUE){
+          name1 <- "NPNA"
+          name2 <- "NPMLE1"
+          predict.boot.out <- get_AUC_BS_differences(bb,name1,name2,predict.boot.out)
+          Sout.predict.boot.out <- get_AUC_BS_differences(bb,name1,name2,Sout.predict.boot.out)
+        }
 
-		if(run.NPMLEs==TRUE & run.NPNA_avg==TRUE){
-			name1 <- "NPMLE1"
-			name2 <- "NPNA_avg"
+        if(run.NPMLEs==TRUE & run.NPNA_avg==TRUE){
+          name1 <- "NPMLE1"
+          name2 <- "NPNA_avg"
 
-			predict.boot.out <- get_AUC_BS_differences(bb,name1,name2,predict.boot.out)
-			Sout.predict.boot.out <- get_AUC_BS_differences(bb,name1,name2,Sout.predict.boot.out)
+          predict.boot.out <- get_AUC_BS_differences(bb,name1,name2,predict.boot.out)
+          Sout.predict.boot.out <- get_AUC_BS_differences(bb,name1,name2,Sout.predict.boot.out)
 
-		}
+        }
 
-		if(run.NPNA==TRUE & run.NPNA_wrong==TRUE){
-			name1 <- "NPNA"
-			name2 <- "NPNA_wrong"
-			predict.boot.out <- get_AUC_BS_differences(bb,name1,name2,predict.boot.out)
-			Sout.predict.boot.out <- get_AUC_BS_differences(bb,name1,name2,Sout.predict.boot.out)
+        if(run.NPNA==TRUE & run.NPNA_wrong==TRUE){
+          name1 <- "NPNA"
+          name2 <- "NPNA_wrong"
+          predict.boot.out <- get_AUC_BS_differences(bb,name1,name2,predict.boot.out)
+          Sout.predict.boot.out <- get_AUC_BS_differences(bb,name1,name2,Sout.predict.boot.out)
 
-		}
+        }
 
-	  }
+      }
 
       ## update bb
       bb <- bb + 1
@@ -812,10 +814,10 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
   get.my.variance <- function(theta.boot.out, theta.est){
     varest <- apply.index(theta.boot.out,"iters",var,na.rm=TRUE)
 
-	##varlo <-  apply.index(theta.boot.out,"iters",myquantiles.lo)
+    ##varlo <-  apply.index(theta.boot.out,"iters",myquantiles.lo)
     ##varhi <-  apply.index(theta.boot.out,"iters",myquantiles.hi)
-	varlo <- theta.est + qnorm(0.025)*sqrt(varest)
-	varhi <- theta.est + qnorm(0.975)*sqrt(varest)
+    varlo <- theta.est + qnorm(0.025)*sqrt(varest)
+    varhi <- theta.est + qnorm(0.975)*sqrt(varest)
     list(varest=varest,varlo=varlo,varhi=varhi)
   }
 
@@ -830,20 +832,20 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
   St.estimate.boot[,,,,,,"varhi"]  <- Sout.variance$varhi
 
   if(run.prediction.accuracy==TRUE){
-	  predict.variance <- get.my.variance(predict.boot.out,predict.differences)
-	  Ft.AUC.BS.boot[,,,,"varest"]  <- predict.variance$varest
-	  Ft.AUC.BS.boot[,,,,"varlo"]  <- predict.variance$varlo
-	  Ft.AUC.BS.boot[,,,,"varhi"]  <- predict.variance$varhi
+    predict.variance <- get.my.variance(predict.boot.out,predict.differences)
+    Ft.AUC.BS.boot[,,,,"varest"]  <- predict.variance$varest
+    Ft.AUC.BS.boot[,,,,"varlo"]  <- predict.variance$varlo
+    Ft.AUC.BS.boot[,,,,"varhi"]  <- predict.variance$varhi
 
-	  Sout.predict.variance <- get.my.variance(Sout.predict.boot.out,Sout.predict.differences)
-	  St.AUC.BS.boot[,,,,"varest"]  <- Sout.predict.variance$varest
-	  St.AUC.BS.boot[,,,,"varlo"]  <- Sout.predict.variance$varlo
-	  St.AUC.BS.boot[,,,,"varhi"]  <- Sout.predict.variance$varhi
+    Sout.predict.variance <- get.my.variance(Sout.predict.boot.out,Sout.predict.differences)
+    St.AUC.BS.boot[,,,,"varest"]  <- Sout.predict.variance$varest
+    St.AUC.BS.boot[,,,,"varlo"]  <- Sout.predict.variance$varlo
+    St.AUC.BS.boot[,,,,"varhi"]  <- Sout.predict.variance$varhi
   }
   list(Ft.estimate.boot=Ft.estimate.boot,
-	   St.estimate.boot=St.estimate.boot,
-	   Ft.AUC.BS.boot=Ft.AUC.BS.boot,
-	   St.AUC.BS.boot=St.AUC.BS.boot)
+       St.estimate.boot=St.estimate.boot,
+       Ft.AUC.BS.boot=Ft.AUC.BS.boot,
+       St.AUC.BS.boot=St.AUC.BS.boot)
 }
 
 
@@ -902,8 +904,8 @@ make.data.set <- function(
 
 ## function to sum NAs from array
 sum_array_na <- function(m1,m2){
-	#return(Reduce(`+`, lapply(list(m1,m2),function(x) {x[is.na(x)] <-0;x})))
-	return(ifelse(is.na(m1), ifelse(is.na(m2), NA, m2), ifelse(is.na(m2), m1, m1 + m2)))
+  #return(Reduce(`+`, lapply(list(m1,m2),function(x) {x[is.na(x)] <-0;x})))
+  return(ifelse(is.na(m1), ifelse(is.na(m2), NA, m2), ifelse(is.na(m2), m1, m1 + m2)))
 }
 
 #' Estimator implementation
@@ -1001,12 +1003,12 @@ sum_array_na <- function(m1,m2){
 #' @export
 estimator.main <- function(data,
                            n,p,m,r,qvs,
-						   tval,tval0,
+                           tval,tval0,
                            method.label,
                            z.use,w.use,
-						   update.qs,
+                           update.qs,
                            run.prediction.accuracy,
-   						   do_cross_validation_AUC_BS){
+                           do_cross_validation_AUC_BS){
 
   #############################
   ## dummy variables needed  ##
@@ -1050,336 +1052,336 @@ estimator.main <- function(data,
 
 
   if(do_cross_validation_AUC_BS==TRUE){
-	cv_folds <- 100
+    cv_folds <- 100
   } else {
-	cv_folds <- 1
+    cv_folds <- 1
   }
 
-## BEGIN OLD CODE FOR CV
+  ## BEGIN OLD CODE FOR CV
   ## create data folds
-#  if(cv_folds > 1){
-#	  random_sample <- sample(1:3,size=nrow(data),
-#			replace=TRUE,prob=rep(1,cv_folds)/cv_folds)
-#	  data_folds <- setNames(split(data,random_sample), paste0("samp",1:cv_folds))
-# }
-## END OLD CODE FOR CV
+  #  if(cv_folds > 1){
+  #	  random_sample <- sample(1:3,size=nrow(data),
+  #			replace=TRUE,prob=rep(1,cv_folds)/cv_folds)
+  #	  data_folds <- setNames(split(data,random_sample), paste0("samp",1:cv_folds))
+  # }
+  ## END OLD CODE FOR CV
 
 
 
   for(cvv in 1:cv_folds){
 
-	  ###########################
-	  ## split data into folds ##
-	  ###########################
-	  if(cv_folds>1){
-	## BEGIN OLD CODE FOR CV
-	#	data_train <- dplyr::bind_rows(data_folds[-cvv])
-	#	  data_test <- data_folds[[cvv]]
-	## END OLD CODE FOR CV
-
-		num_train <- round(0.6*n)
-		train_ind <- sample(1:n, num_train, replace = FALSE)
-		test_ind <- setdiff(1:n, train_ind)
-
-		data_train <- data[train_ind,]
-		data_test <- data[test_ind,]
-	  } else {
-		data_train <- data
-		data_test <- data
-	  }
-
-	  ## sort in increasing order by x
-	  data_train <- data_train[order(data_train$x),]
-	  data_test <- data_test[order(data_test$x),]
-
-	  n_use <- nrow(data_train)
-  	  p_use <- p
-	  q_use <- t(data_train[,c("q1","q2")])
-	  qvs_use <- t(as.matrix(unique(t(q_use))))
-	  tmp_info <- get_new_qvs(qvs_use,qvs)
-	  qvs_use <- tmp_info$qvs_new
-	  m_use<- tmp_info$m_new
-	  r_use <- compute.r(n_use,m_use,p_use,qvs_use,q_use)
-
-	  #################
-	  ## update q's? ##
-	  #################
-	  get.info.use <- get.new.qs(data_train,n_use,p_use,m_use,r_use,qvs_use,tval0,
-									method.label,update.qs)
-
-
-	  ##########################
-	  ## estimation procedure ##
-	  ##########################
-	  for(tt0 in 1:length(tval0)){
-		##cat("tt0=",tt0)
-
-
-		for(kk in 1:length(method.label)){
-		  ##cat("kk=",kk)
-
-
-		  ########################
-		  ## Index used for tt0 ##
-		  ########################
-		  if(method.label[kk]=="NPNA_wrong"){
-			tt0.use <- which(tval0==0)
-		  } else {
-			tt0.use <- tt0
-		  }
-
-
-		  ####################################################
-		  ## subset of data where subjects survived past t0 ##
-		  ####################################################
-		  #index_train_use <- which(data$x>tval0[tt0.use] & data$delta>0)## 8/24/2016: wrong
-		  index_train_use <- which(data_train$x>tval0[tt0.use]) ## 8/24/2016: this is the correct one.
-		  data_train_subset <- data_train[index_train_use,]
-
-		  index_test_use <- which(data_test$x>tval0[tt0.use])
-		  data_test_subset <- data_test[index_test_use,]
-
-		  ############################
-		  ## information used at t0 ##
-		  ############################
-		  info.tmp <- get.info.use[[tt0.use]]
-
-		  ## qvs.use depends on method of Ft estimator
-		  qvs.tmp <- info.tmp$qvs[[method.label[kk]]]
-
-		  ## r info for weights
-		  r.tmp <- info.tmp$r[[method.label[kk]]]
-
-		  #####################
-		  ## set up the data ##
-		  #####################
-		  tmp.out <- get.tmp.storage(run.prediction.accuracy,
-										method=method.label[kk],
-										z.use,w.use,
-										data_test_subset,p,m)
-
-		  data_test_zw <- tmp.out$data.zw
-
-		  Ft_test_out <- tmp.out$Ft.tmp.out
-		  Sout_test_out <- tmp.out$Sout.tmp.out
-
-		  ## information to run kin-cohort estimators. From data_train
-		  q.tmp <- t(info.tmp$q[[method.label[kk]]])
-		  n.tmp <- nrow(data_train)
-		  m.tmp <- length(table(data_train$q1))
-		  x.tmp <- data_train[,"x"]
-		  delta.tmp <- data_train[,"delta"]
-
-
-		  ##########################
-		  ## NPMLE estimator at t0 ##
-		  ##########################
-		  if(!grepl("NPNA*",method.label[kk])){
-			set.run <- set.kin.run(method.label[kk])
-
-			## run kin-cohort estimator
-			kin.out0 <- kincohort.estimators(n.tmp,
-											 q=q.tmp,
-											 x=x.tmp,
-											 delta=delta.tmp,
-											 tval0[tt0],
-											 qvs=qvs.tmp,
-											 p,m.tmp,
-											 r=r.tmp,
-											 boot=0,bootvar,
-											 useOLS=set.run$run.OLS,
-											 useWLS=set.run$run.WLS,
-											 useEFF=set.run$run.EFF,
-											 useNPMLEs=set.run$run.NPMLEs)
-		  }
-
-		  for(tt in 1:length(tval)){
-			##cat("tt=",tt)
-
-			###########################################
-			## Valid to compute F(t|t0) when t> t0. ##
-			###########################################
-			if(tval[tt] > tval0[tt0]){
-
-			  ####################
-			  ## NPMLE estimator ##
-			  ####################
-
-			  if(!grepl("NPNA*",method.label[kk])){
-				## run kin-cohort estimator
-				kin.out <- kincohort.estimators(n.tmp,
-												q=q.tmp,
-												x=x.tmp,
-												delta=delta.tmp,
-												tval[tt],
-												qvs=qvs.tmp,
-												p,m.tmp,
-												r=r.tmp,
-												boot=0,bootvar,
-												useOLS=set.run$run.OLS,
-												useWLS=set.run$run.WLS,
-												useEFF=set.run$run.EFF,
-												useNPMLEs=set.run$run.NPMLEs)
-
-				if(method.label[kk]=="NPMLE1"){
-				  ## 1-S(t|t0,z,w)
-				  myHout <- (kin.out$hts0-kin.out0$hts0)/
-					(1-kin.out0$hts0)
-				  mySout <- 1- myHout
-				  Sout_test_out[,paste("St",1:m,sep="")] <-
-					rep.row(mySout,nrow(Sout_test_out))
-
-				  ## F(t|t0,z,w)
-				  u.tmp <- t(qvs.tmp)
-
-				  myFest <- solve(t(u.tmp) %*% diag(r.tmp) %*% u.tmp) %*%
-					t(u.tmp) %*% diag(r.tmp) %*% myHout
-
-				  Ft_test_out[,paste("Ft",1:p,sep="")] <- rep.row(myFest,nrow(Ft_test_out))
-				}
-
-
-
-			  } else {
-
-				####################
-				## NPNA estimator ##
-				####################
-
-				#####################################
-				## what(z,w,u) data to evaluate at ##
-				#####################################
-				data_test_zw_evaluate <- get.zw.evaluate(data_test_zw,m)
-
-				######################################
-				## get data for landmark estimation ##
-				######################################
-				data.land <- data_train_subset[,c("x","delta","z","w","uset")]
-
-				## run NPNA estimator at tt, and report values at data.evaluate
-				S.NPNA.zw.out <- S.NPNA.zw(t=tval[tt],
-										   data=data.land,
-										   newdata=data_test_zw_evaluate)
-
-				## report any problems from S.NPNA.zw
-				problem.tmp <- S.NPNA.zw.out$problem
-				if(!is.null(problem.tmp)){
-				  problem <- problem.tmp
-				}
-
-				## report output
-				NPNA.out <-  as.data.frame(S.NPNA.zw.out$data.out)
-
-				## Form F(t),St.estimate
-				for(ll in 1:nrow(Ft_test_out)){
-
-				  ## get appropriate rows for (z,w) estimates
-				  z.tmp <- Ft_test_out[ll,"z"]
-				  w.tmp <- Ft_test_out[ll,"w"]
-
-				  ## get appropriate subset of NPNA.out
-				  NPNA.out.tmp <- NPNA.out[which(NPNA.out$w==w.tmp & NPNA.out$z==z.tmp),]
-				  Sout.tmp <- NPNA.out.tmp$survival.v.new
-				  Sout_test_out[ll,paste("St",1:m,sep="")] <- Sout.tmp
-
-				  u.index <- NPNA.out.tmp$u
-				  u.tmp <- t(qvs.tmp[,u.index])
-
-				  ## FOR TESTING. NEED TO REMOVE!!!
-				  ##r.tmp <- rep(1,length(r.tmp))
-
-				  ## form (U^TU)^{-1} U^T (1-S(t|z,w))
-				  Ft_test_out[ll,paste("Ft",1:p,sep="")] <-
-					solve(t(u.tmp) %*% diag(r.tmp) %*% u.tmp) %*%
-					t(u.tmp) %*%  diag(r.tmp) %*% (1-Sout.tmp)
-
-
-				}
-
-			  }
-
-			  if(run.prediction.accuracy==TRUE){
-				###################################
-				## output results for prediction ##
-				###################################
-
-
-				########################
-				## NPNA-avg estimator ##
-				########################
-				if(method.label[kk]=="NPNA_avg"){
-				  Ft.tmp.avg <- apply(Ft_test_out[,paste("Ft",1:p,sep="")],2,mean)
-				  Ft_test_out[,paste("Ft",1:p,sep="")] <- rep.row(Ft.tmp.avg,nrow(Ft_test_out))
-
-				  Sout.tmp.avg <- apply(Sout_test_out[,paste("St",1:m,sep="")],2,mean)
-				  Sout_test_out[,paste("St",1:m,sep="")] <-
-					rep.row(Sout.tmp.avg,nrow(Sout_test_out))
-				}
-
-				## need to feed in data for all samples
-				Ft.predict.tmp <- matrix(NA,nrow(data_test))
-				Sout.predict.tmp <- matrix(NA, nrow(data_test))
-
-				for(ii in 1:length(index_test_use)){
-				  u <- data_test_subset[ii,"uset"]
-				  Sout.predict.tmp[index_test_use[ii]] <- Sout_test_out[ii,paste("St",u,sep="")]
-				  Ft.predict.tmp[index_test_use[ii]] <-
-					Ft_test_out[ii,paste("Ft",
-						data_test[index_test_use[ii],"group"],sep="")]
-				}
-
-				Sout.predict.tmp.use <- Sout.predict.tmp[index_test_use]
-				Ft.predict.tmp.use <- Ft.predict.tmp[index_test_use]
-
-				## feed in original data
-				data.land.predict <- data_test_subset[,c("x","delta","z","w","uset")]
-				Sout.prediction <- get.predictions(data.land.predict,
-								   Ft=1-Sout.predict.tmp.use,
-								   t0=tval0[tt0],tau=tval[tt]-tval0[tt0])
-
-				Sout.store[kk,tt,tt0,"AUC"] <- sum_array_na(Sout.store[kk,tt,tt0,"AUC"],
-											Sout.prediction$AUC$AUC.est/cv_folds)
-
-				Sout.store[kk,tt,tt0,"BS"] <- sum_array_na(Sout.store[kk,tt,tt0,"BS"],
-												Sout.prediction$BS$Brier.score/cv_folds)
-
-				Ft.prediction <- get.predictions(data.land.predict,Ft=Ft.predict.tmp.use,
-												 t0=tval0[tt0],tau=tval[tt]-tval0[tt0])
-
-				Ft.store[kk,tt,tt0,"AUC"] <- sum_array_na(Ft.store[kk,tt,tt0,"AUC"],
-												Ft.prediction$AUC$AUC.est/cv_folds)
-
-				Ft.store[kk,tt,tt0,"BS"] <- sum_array_na(Ft.store[kk,tt,tt0,"BS"],
-												Ft.prediction$BS$Brier.score/cv_folds)
-
-			  } else {
-
-				######################################
-				## output results at specific (z,w) ##
-				######################################
-				if(method.label[kk]!="NPNA_avg"){
-				  Ft.store[kk,tt,tt0,,,] <- unflatten.array(Ft.store[kk,tt,tt0,,,],
-															dim.order=c("zz","ww","Ft"),
-															Ft_test_out[,paste("Ft",1:p,sep="")],
-															flatten.name="Ft")
-
-				  Sout.store[kk,tt,tt0,,,] <- unflatten.array(Sout.store[kk,tt,tt0,,,],
-															  dim.order=c("zz","ww","Ft"),
-															  Sout_test_out[,paste("St",1:m,sep="")],
-															  flatten.name="Ft")
-				} else{
-				  ## take average over all (z,w) combinations
-				  Ft.tmp.avg <- apply(Ft_test_out[,paste("Ft",1:p,sep="")],2,mean)
-				  Ft.store[kk,tt,tt0,,,] <- repeat.zw(Ft.tmp.avg,z.use,w.use,p)
-
-				  Sout.tmp.avg <- apply(Sout_test_out[,paste("St",1:m,sep="")],2,mean)
-				  Sout.store[kk,tt,tt0,,,] <- repeat.zw(Sout.tmp.avg,z.use,w.use,m)
-				}
-			  }
-			}
-		  }
-		}
-	  }
+    ###########################
+    ## split data into folds ##
+    ###########################
+    if(cv_folds>1){
+      ## BEGIN OLD CODE FOR CV
+      #	data_train <- dplyr::bind_rows(data_folds[-cvv])
+      #	  data_test <- data_folds[[cvv]]
+      ## END OLD CODE FOR CV
+
+      num_train <- round(0.6*n)
+      train_ind <- sample(1:n, num_train, replace = FALSE)
+      test_ind <- setdiff(1:n, train_ind)
+
+      data_train <- data[train_ind,]
+      data_test <- data[test_ind,]
+    } else {
+      data_train <- data
+      data_test <- data
+    }
+
+    ## sort in increasing order by x
+    data_train <- data_train[order(data_train$x),]
+    data_test <- data_test[order(data_test$x),]
+
+    n_use <- nrow(data_train)
+    p_use <- p
+    q_use <- t(data_train[,c("q1","q2")])
+    qvs_use <- t(as.matrix(unique(t(q_use))))
+    tmp_info <- get_new_qvs(qvs_use,qvs)
+    qvs_use <- tmp_info$qvs_new
+    m_use<- tmp_info$m_new
+    r_use <- compute.r(n_use,m_use,p_use,qvs_use,q_use)
+
+    #################
+    ## update q's? ##
+    #################
+    get.info.use <- get.new.qs(data_train,n_use,p_use,m_use,r_use,qvs_use,tval0,
+                               method.label,update.qs)
+
+
+    ##########################
+    ## estimation procedure ##
+    ##########################
+    for(tt0 in 1:length(tval0)){
+      ##cat("tt0=",tt0)
+
+
+      for(kk in 1:length(method.label)){
+        ##cat("kk=",kk)
+
+
+        ########################
+        ## Index used for tt0 ##
+        ########################
+        if(method.label[kk]=="NPNA_wrong"){
+          tt0.use <- which(tval0==0)
+        } else {
+          tt0.use <- tt0
+        }
+
+
+        ####################################################
+        ## subset of data where subjects survived past t0 ##
+        ####################################################
+        #index_train_use <- which(data$x>tval0[tt0.use] & data$delta>0)## 8/24/2016: wrong
+        index_train_use <- which(data_train$x>tval0[tt0.use]) ## 8/24/2016: this is the correct one.
+        data_train_subset <- data_train[index_train_use,]
+
+        index_test_use <- which(data_test$x>tval0[tt0.use])
+        data_test_subset <- data_test[index_test_use,]
+
+        ############################
+        ## information used at t0 ##
+        ############################
+        info.tmp <- get.info.use[[tt0.use]]
+
+        ## qvs.use depends on method of Ft estimator
+        qvs.tmp <- info.tmp$qvs[[method.label[kk]]]
+
+        ## r info for weights
+        r.tmp <- info.tmp$r[[method.label[kk]]]
+
+        #####################
+        ## set up the data ##
+        #####################
+        tmp.out <- get.tmp.storage(run.prediction.accuracy,
+                                   method=method.label[kk],
+                                   z.use,w.use,
+                                   data_test_subset,p,m)
+
+        data_test_zw <- tmp.out$data.zw
+
+        Ft_test_out <- tmp.out$Ft.tmp.out
+        Sout_test_out <- tmp.out$Sout.tmp.out
+
+        ## information to run kin-cohort estimators. From data_train
+        q.tmp <- t(info.tmp$q[[method.label[kk]]])
+        n.tmp <- nrow(data_train)
+        m.tmp <- length(table(data_train$q1))
+        x.tmp <- data_train[,"x"]
+        delta.tmp <- data_train[,"delta"]
+
+
+        ##########################
+        ## NPMLE estimator at t0 ##
+        ##########################
+        if(!grepl("NPNA*",method.label[kk])){
+          set.run <- set.kin.run(method.label[kk])
+
+          ## run kin-cohort estimator
+          kin.out0 <- kincohort.estimators(n.tmp,
+                                           q=q.tmp,
+                                           x=x.tmp,
+                                           delta=delta.tmp,
+                                           tval0[tt0],
+                                           qvs=qvs.tmp,
+                                           p,m.tmp,
+                                           r=r.tmp,
+                                           boot=0,bootvar,
+                                           useOLS=set.run$run.OLS,
+                                           useWLS=set.run$run.WLS,
+                                           useEFF=set.run$run.EFF,
+                                           useNPMLEs=set.run$run.NPMLEs)
+        }
+
+        for(tt in 1:length(tval)){
+          ##cat("tt=",tt)
+
+          ###########################################
+          ## Valid to compute F(t|t0) when t> t0. ##
+          ###########################################
+          if(tval[tt] > tval0[tt0]){
+
+            ####################
+            ## NPMLE estimator ##
+            ####################
+
+            if(!grepl("NPNA*",method.label[kk])){
+              ## run kin-cohort estimator
+              kin.out <- kincohort.estimators(n.tmp,
+                                              q=q.tmp,
+                                              x=x.tmp,
+                                              delta=delta.tmp,
+                                              tval[tt],
+                                              qvs=qvs.tmp,
+                                              p,m.tmp,
+                                              r=r.tmp,
+                                              boot=0,bootvar,
+                                              useOLS=set.run$run.OLS,
+                                              useWLS=set.run$run.WLS,
+                                              useEFF=set.run$run.EFF,
+                                              useNPMLEs=set.run$run.NPMLEs)
+
+              if(method.label[kk]=="NPMLE1"){
+                ## 1-S(t|t0,z,w)
+                myHout <- (kin.out$hts0-kin.out0$hts0)/
+                  (1-kin.out0$hts0)
+                mySout <- 1- myHout
+                Sout_test_out[,paste("St",1:m,sep="")] <-
+                  rep.row(mySout,nrow(Sout_test_out))
+
+                ## F(t|t0,z,w)
+                u.tmp <- t(qvs.tmp)
+
+                myFest <- solve(t(u.tmp) %*% diag(r.tmp) %*% u.tmp) %*%
+                  t(u.tmp) %*% diag(r.tmp) %*% myHout
+
+                Ft_test_out[,paste("Ft",1:p,sep="")] <- rep.row(myFest,nrow(Ft_test_out))
+              }
+
+
+
+            } else {
+
+              ####################
+              ## NPNA estimator ##
+              ####################
+
+              #####################################
+              ## what(z,w,u) data to evaluate at ##
+              #####################################
+              data_test_zw_evaluate <- get.zw.evaluate(data_test_zw,m)
+
+              ######################################
+              ## get data for landmark estimation ##
+              ######################################
+              data.land <- data_train_subset[,c("x","delta","z","w","uset")]
+
+              ## run NPNA estimator at tt, and report values at data.evaluate
+              S.NPNA.zw.out <- S.NPNA.zw(t=tval[tt],
+                                         data=data.land,
+                                         newdata=data_test_zw_evaluate)
+
+              ## report any problems from S.NPNA.zw
+              problem.tmp <- S.NPNA.zw.out$problem
+              if(!is.null(problem.tmp)){
+                problem <- problem.tmp
+              }
+
+              ## report output
+              NPNA.out <-  as.data.frame(S.NPNA.zw.out$data.out)
+
+              ## Form F(t),St.estimate
+              for(ll in 1:nrow(Ft_test_out)){
+
+                ## get appropriate rows for (z,w) estimates
+                z.tmp <- Ft_test_out[ll,"z"]
+                w.tmp <- Ft_test_out[ll,"w"]
+
+                ## get appropriate subset of NPNA.out
+                NPNA.out.tmp <- NPNA.out[which(NPNA.out$w==w.tmp & NPNA.out$z==z.tmp),]
+                Sout.tmp <- NPNA.out.tmp$survival.v.new
+                Sout_test_out[ll,paste("St",1:m,sep="")] <- Sout.tmp
+
+                u.index <- NPNA.out.tmp$u
+                u.tmp <- t(qvs.tmp[,u.index])
+
+                ## FOR TESTING. NEED TO REMOVE!!!
+                ##r.tmp <- rep(1,length(r.tmp))
+
+                ## form (U^TU)^{-1} U^T (1-S(t|z,w))
+                Ft_test_out[ll,paste("Ft",1:p,sep="")] <-
+                  solve(t(u.tmp) %*% diag(r.tmp) %*% u.tmp) %*%
+                  t(u.tmp) %*%  diag(r.tmp) %*% (1-Sout.tmp)
+
+
+              }
+
+            }
+
+            if(run.prediction.accuracy==TRUE){
+              ###################################
+              ## output results for prediction ##
+              ###################################
+
+
+              ########################
+              ## NPNA-avg estimator ##
+              ########################
+              if(method.label[kk]=="NPNA_avg"){
+                Ft.tmp.avg <- apply(Ft_test_out[,paste("Ft",1:p,sep="")],2,mean)
+                Ft_test_out[,paste("Ft",1:p,sep="")] <- rep.row(Ft.tmp.avg,nrow(Ft_test_out))
+
+                Sout.tmp.avg <- apply(Sout_test_out[,paste("St",1:m,sep="")],2,mean)
+                Sout_test_out[,paste("St",1:m,sep="")] <-
+                  rep.row(Sout.tmp.avg,nrow(Sout_test_out))
+              }
+
+              ## need to feed in data for all samples
+              Ft.predict.tmp <- matrix(NA,nrow(data_test))
+              Sout.predict.tmp <- matrix(NA, nrow(data_test))
+
+              for(ii in 1:length(index_test_use)){
+                u <- data_test_subset[ii,"uset"]
+                Sout.predict.tmp[index_test_use[ii]] <- Sout_test_out[ii,paste("St",u,sep="")]
+                Ft.predict.tmp[index_test_use[ii]] <-
+                  Ft_test_out[ii,paste("Ft",
+                                       data_test[index_test_use[ii],"group"],sep="")]
+              }
+
+              Sout.predict.tmp.use <- Sout.predict.tmp[index_test_use]
+              Ft.predict.tmp.use <- Ft.predict.tmp[index_test_use]
+
+              ## feed in original data
+              data.land.predict <- data_test_subset[,c("x","delta","z","w","uset")]
+              Sout.prediction <- get.predictions(data.land.predict,
+                                                 Ft=1-Sout.predict.tmp.use,
+                                                 t0=tval0[tt0],tau=tval[tt]-tval0[tt0])
+
+              Sout.store[kk,tt,tt0,"AUC"] <- sum_array_na(Sout.store[kk,tt,tt0,"AUC"],
+                                                          Sout.prediction$AUC$AUC.est/cv_folds)
+
+              Sout.store[kk,tt,tt0,"BS"] <- sum_array_na(Sout.store[kk,tt,tt0,"BS"],
+                                                         Sout.prediction$BS$Brier.score/cv_folds)
+
+              Ft.prediction <- get.predictions(data.land.predict,Ft=Ft.predict.tmp.use,
+                                               t0=tval0[tt0],tau=tval[tt]-tval0[tt0])
+
+              Ft.store[kk,tt,tt0,"AUC"] <- sum_array_na(Ft.store[kk,tt,tt0,"AUC"],
+                                                        Ft.prediction$AUC$AUC.est/cv_folds)
+
+              Ft.store[kk,tt,tt0,"BS"] <- sum_array_na(Ft.store[kk,tt,tt0,"BS"],
+                                                       Ft.prediction$BS$Brier.score/cv_folds)
+
+            } else {
+
+              ######################################
+              ## output results at specific (z,w) ##
+              ######################################
+              if(method.label[kk]!="NPNA_avg"){
+                Ft.store[kk,tt,tt0,,,] <- unflatten.array(Ft.store[kk,tt,tt0,,,],
+                                                          dim.order=c("zz","ww","Ft"),
+                                                          Ft_test_out[,paste("Ft",1:p,sep="")],
+                                                          flatten.name="Ft")
+
+                Sout.store[kk,tt,tt0,,,] <- unflatten.array(Sout.store[kk,tt,tt0,,,],
+                                                            dim.order=c("zz","ww","Ft"),
+                                                            Sout_test_out[,paste("St",1:m,sep="")],
+                                                            flatten.name="Ft")
+              } else{
+                ## take average over all (z,w) combinations
+                Ft.tmp.avg <- apply(Ft_test_out[,paste("Ft",1:p,sep="")],2,mean)
+                Ft.store[kk,tt,tt0,,,] <- repeat.zw(Ft.tmp.avg,z.use,w.use,p)
+
+                Sout.tmp.avg <- apply(Sout_test_out[,paste("St",1:m,sep="")],2,mean)
+                Sout.store[kk,tt,tt0,,,] <- repeat.zw(Sout.tmp.avg,z.use,w.use,m)
+              }
+            }
+          }
+        }
+      }
+    }
   }
   list(Ft.store=Ft.store,Sout.store=Sout.store,problem=problem)
 }
@@ -1574,16 +1576,16 @@ kincohort.estimators <- function(n,q,x,delta,
   ## prepare output
   mylabel <- c("IPW","AIPW","IMP")
   Fest <- array(0,dim=c(p,num_estimators),dimnames=list(paste("p",1:p,sep=""),
-                           c(paste("OLS",mylabel,sep=""),
-                             paste("WLS",mylabel,sep=""),
-                             paste("EFF",mylabel,sep=""),
-   			     paste("NPMLE",1:2,sep=""))))
+                                                        c(paste("OLS",mylabel,sep=""),
+                                                          paste("WLS",mylabel,sep=""),
+                                                          paste("EFF",mylabel,sep=""),
+                                                          paste("NPMLE",1:2,sep=""))))
   var_est <- array(0,dim=c(p,p,num_estimators),dimnames=list(paste("p",1:p,sep=""),
-                             paste("p",1:p,sep=""),
-                             c(paste("OLS",mylabel,sep=""),
-                             paste("WLS",mylabel,sep=""),
-                             paste("EFF",mylabel,sep=""),
-                             paste("NPMLE",1:2,sep=""))))
+                                                             paste("p",1:p,sep=""),
+                                                             c(paste("OLS",mylabel,sep=""),
+                                                               paste("WLS",mylabel,sep=""),
+                                                               paste("EFF",mylabel,sep=""),
+                                                               paste("NPMLE",1:2,sep=""))))
   hts0 <- rep(0,m)
   eflag <- 0
   storage.mode(Fest) <- "double"
@@ -1601,10 +1603,10 @@ kincohort.estimators <- function(n,q,x,delta,
 
 
   ## UNCOMMENT FOR RUNNING CODE IN UNIX
-#  out <- .Fortran("kincohort_estimators",n,q,x,delta,t,qvs,p,m,r,lim,rat,setting,d,H0,
-#                  num_estimators,boot,bootvar,usetruth,useOLS,useWLS,useEFF,useNPMLEs,
-#                  hts0=hts0,
-#                  Fest=Fest,var_est=var_est,eflag=eflag)
+  #  out <- .Fortran("kincohort_estimators",n,q,x,delta,t,qvs,p,m,r,lim,rat,setting,d,H0,
+  #                  num_estimators,boot,bootvar,usetruth,useOLS,useWLS,useEFF,useNPMLEs,
+  #                  hts0=hts0,
+  #                  Fest=Fest,var_est=var_est,eflag=eflag)
 
   ## } else {
   ##   out <- list(hts0=hts0,Fest=Fest,var_est=var_est,eflag=eflag)
@@ -2083,7 +2085,7 @@ S.NPNA.zw = function(t, data, newdata = NULL, weight = NULL){
   }
   if(is.null(newdata)) {return(list(data.out=data,problem=problem))}
   if(!is.null(newdata)) {return(list(data.out=newdata.matrix,problem=problem))}
-  }
+}
 
 
 ## function to get AUC, and BS calculations
@@ -2091,7 +2093,7 @@ S.NPNA.zw = function(t, data, newdata = NULL, weight = NULL){
 #' @importFrom landpred BS.landmark
 get.predictions <- function(data.land,Ft,t0,tau){
   data.for.prediction <- cbind(data.land$x,data.land$delta,
-							rep(NA,length(data.land$delta)),Ft)
+                               rep(NA,length(data.land$delta)),Ft)
   AUC <- landpred::AUC.landmark(t0=t0,tau=tau,short=FALSE,data=data.for.prediction)
   BS <- landpred::BS.landmark(t0=t0,tau=tau,short=FALSE,data=data.for.prediction)
   list(AUC=AUC,BS=BS)
