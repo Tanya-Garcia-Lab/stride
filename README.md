@@ -28,17 +28,11 @@ application to the Cooperative Huntington's Observational Research Trial. Journa
 
 ## Installation
 
-You can install the released version of stride from [CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("stride")
-```
-
-And the development version from [GitHub](https://github.com/) with:
+You can install the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("tpgarcia/stride")
+devtools::install_github("tpgarcia/stride", force=TRUE)
 ```
 ## Example
 
@@ -47,27 +41,61 @@ This is a basic example which shows you how to solve a common problem:
 
 ```r
 library(stride)
-## basic example code
+
+# Setup parameters to generate the data
+set.seed(1)
+censoring.rate <- 40
+p <- 2
+n <- 2000
+m <- 4
+tval <- seq(0,80,by=5)  
+tval0 <- c(0,20,30,40,50)
+z.use <- c(0,1)
+w.use <- seq(35,55,by=1)
+run.prediction.accuracy <- TRUE
+update.qs <- FALSE
+simu.setting <- "2A"
+covariate.dependent <- TRUE
+run.NPMLEs <- TRUE
+run.NPNA <- TRUE
+run.OLS <- FALSE
+run.WLS <- FALSE
+run.EFF <- FALSE
+run.NPNA_avg <- FALSE
+run.NPNA_wrong <- FALSE
+do_cross_validation_AUC_BS <- FALSE
+know.true.groups <- TRUE
+
+
+## compute the finite set of mixture proportions
+qvs <- qvs.values(p,m)
+
+## generate the data
+
+data.gen <- GenerateData(n,p,m,qvs,censoring.rate,simu.setting,covariate.dependent)
+
+x <- data.gen$x
+delta <- data.gen$delta
+q <- data.gen$q
+ww <- data.gen$ww
+zz <- data.gen$zz
+
+
+## true group membership (needed to compute the AUC/BS for simulated data
+true.groups <- data.gen$true.groups
+
+## Perform the estimation			
+estimators.out <- stride.estimator(n,m,p,qvs,q,
+				x,delta,ww,zz,
+				run.NPMLEs,
+				run.NPNA,
+				run.NPNA_avg,
+				run.NPNA_wrong,
+				tval,tval0,
+				z.use,w.use,
+				update.qs,
+				know.true.groups,
+				true.groups,
+				run.prediction.accuracy,
+				do_cross_validation_AUC_BS)
 ```
-
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-
-```r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
-```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.
-
-You can also embed plots, for example:
-
-<img src="man/figures/README-pressure-1.png" title="plot of chunk pressure" alt="plot of chunk pressure" width="100%" />
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub!
