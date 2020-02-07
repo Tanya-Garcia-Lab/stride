@@ -10,12 +10,3 @@ STRIDE stands for robu(ST) powe(R)ful m(I)xture mo(DE)ls.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.0.1), stats
-Imports:
- landpred,
- utils
-Collate:
- landmix.R
- main.R
- GenerateData.R
-RoxygenNote: 6.1.1
