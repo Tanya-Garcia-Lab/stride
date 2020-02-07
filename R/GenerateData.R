@@ -10,7 +10,7 @@
 #' mixture proportions (i.e., the probability of belonging to each population k, k=1,...,p.).
 #' @param censoring.rate a scalar indicating the censoring proportion. Options are 0 or 50.
 #' @param simu.setting Character indicating simulation setting. Options are "1A", "1B", "2A","2B".
-#' Setting "1A" and "1B" refer to Simulation setting 1 in the referenced paper, "1A" means the
+#' Setting "1A" and "1B" refer to Simulation setting 1 in Garcia and Parast (2020), "1A" means the
 #' survival outcomes do NOT depend on the covariates, and "1B" means the
 #' survival outcomes do depend on the covariates.
 #' Setting "2A" and "2B" refer to Simulation setting 2 in the referenced paper, "2A" means the
@@ -72,15 +72,15 @@ GenerateData <- function(n,p,m,qvs,censoring.rate,simu.setting,covariate.depende
 
     for(i in 1:n){
       q1<- q[,i]
-	
+
 	  negative_value <- TRUE
 	  while(negative_value==TRUE){
 		t1 <- trueinvFt(p,ww[i],zz[i],simu.setting,covariate.dependent)
 		if(all(t1>0)){
 			negative_value <- FALSE
 		}
-	  }	
-	  
+	  }
+
       a <- runif(1)
       tmp <- q1[1]
       j <- 1
