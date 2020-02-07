@@ -13,7 +13,7 @@
 #' Setting "1A" and "1B" refer to Simulation setting 1 in Garcia and Parast (2020), "1A" means the
 #' survival outcomes do NOT depend on the covariates, and "1B" means the
 #' survival outcomes do depend on the covariates.
-#' Setting "2A" and "2B" refer to Simulation setting 2 in the referenced paper, "2A" means the
+#' Setting "2A" and "2B" refer to Simulation setting 2 in Garcia and Parast (2020), "2A" means the
 #' survival outcomes do NOT depend on the covariates, and "2B" means the
 #' survival outcomes do depend on the covariates.
 #' @param covariate.dependent logical indicator. If TRUE, then the survival times depend on covariates.
