@@ -28,7 +28,7 @@ qvs <- qvs.values(p,m)
 
 ## generate the data
 
-data.gen <- GenerateData(n,p,m,qvs,censoring.rate,simu.setting,covariate.dependent)
+data.gen <- GenerateData(n,p,m,qvs,censoring.rate,simu.setting)
 
 x <- data.gen$x
 delta <- data.gen$delta
