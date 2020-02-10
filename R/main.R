@@ -5,8 +5,8 @@
 ##
 ## Functions for the main method
 ##
-##
 ####################################
+##
 ####################################
 
 stride.estimator.wrapper <- function(
@@ -1227,6 +1227,7 @@ estimator.main <- function(data,
                 ## 1-S(t|t0,z,w)
                 myHout <- (kin.out$hts0-kin.out0$hts0)/
                   (1-kin.out0$hts0)
+
                 mySout <- 1- myHout
                 Sout_test_out[,paste("St",1:m,sep="")] <-
                   rep.row(mySout,nrow(Sout_test_out))
