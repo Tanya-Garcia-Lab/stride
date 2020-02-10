@@ -10,7 +10,7 @@ z.use <- c(0,1)
 w.use <- seq(35,55,by=1)
 run.prediction.accuracy <- TRUE
 update.qs <- FALSE
-simu.setting <- "2A"
+simu.setting <- "HD-No-Covariates"
 covariate.dependent <- TRUE
 run.NPMLEs <- TRUE
 run.NPNA <- TRUE

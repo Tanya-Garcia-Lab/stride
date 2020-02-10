@@ -9,12 +9,12 @@
 #' @param qvs a numeric matrix of size \code{p} by \code{m} containing all possible
 #' mixture proportions (i.e., the probability of belonging to each population k, k=1,...,p.).
 #' @param censoring.rate a scalar indicating the censoring proportion. Options are 0 or 50.
-#' @param simu.setting Character indicating simulation setting. Options are "1A", "1B", "2A","2B".
-#' Setting "1A" and "1B" refer to Simulation setting 1 in Garcia and Parast (2020), "1A" means the
-#' survival outcomes do NOT depend on the covariates, and "1B" means the
+#' @param simu.setting Character indicating simulation setting. Options are "Log-Normal-No-Covariates", "Log-Normal-With-Covariates", "HD-No-Covariates","HD-With-Covariates".
+#' Setting "Log-Normal-No-Covariates" and "Log-Normal-With-Covariates" refer to Simulation setting 1 in Garcia and Parast (2020), "Log-Normal-No-Covariates" means the
+#' survival outcomes do NOT depend on the covariates, and "Log-Normal-With-Covariates" means the
 #' survival outcomes do depend on the covariates.
-#' Setting "2A" and "2B" refer to Simulation setting 2 in Garcia and Parast (2020), "2A" means the
-#' survival outcomes do NOT depend on the covariates, and "2B" means the
+#' Setting "HD-No-Covariates" and "HD-With-Covariates" refer to Simulation setting 2 in Garcia and Parast (2020), "HD-No-Covariates" means the
+#' survival outcomes do NOT depend on the covariates, and "HD-With-Covariates" means the
 #' survival outcomes do depend on the covariates.
 #' @param covariate.dependent logical indicator. If TRUE, then the survival times depend on covariates.
 #'
@@ -135,7 +135,7 @@ mult.z <- function(covariate.dependent){
 #' @import stats
 Ft.form <- function(tt,tt0,ww,zz,covariate.dependent,p,simu.setting){
 	out <- rep(0,p)
-	if(simu.setting == "1A" | simu.setting=="1B"){
+	if(simu.setting == "Log-Normal-No-Covariates" | simu.setting=="Log-Normal-With-Covariates"){
 		sd.use <- getsd(p)
       	constant.z <- mult.z(covariate.dependent)
       	constant.w <- mult.w(covariate.dependent)
@@ -150,7 +150,7 @@ Ft.form <- function(tt,tt0,ww,zz,covariate.dependent,p,simu.setting){
     	   (1-pnorm(log(tt0)- constant.w * ww -
 				   constant.z * zz, mean=0,sd=sd.use[jj]))
 		}
-	}else if(simu.setting=="2A" | simu.setting=="2B"){
+	}else if(simu.setting=="HD-No-Covariates" | simu.setting=="HD-With-Covariates"){
       	           out[1] <-
 		( F1(tt,ww,zz,covariate.dependent)- F1(tt0,ww,zz,covariate.dependent) ) /
       		      	 ( 1 - F1(tt0,ww,zz,covariate.dependent) )
@@ -303,27 +303,27 @@ genc <- function(s,censoring.rate,simu.setting){
   if(censoring.rate==0){
     out <- s + 1
   } else if(censoring.rate==20){
-    if(simu.setting=="1A"){
+    if(simu.setting=="Log-Normal-No-Covariates"){
       out <- runif(1,0,25)
-    } else if(simu.setting=="1B"){
+    } else if(simu.setting=="Log-Normal-With-Covariates"){
       out <- runif(1,0,22)
-    } else if(simu.setting=="2A"){
+    } else if(simu.setting=="HD-No-Covariates"){
       #out <- runif(1,50,90)
       ##out <- runif(1,0,80)
       out <- runif(1,0,210)
-    } else if(simu.setting=="2B"){
+    } else if(simu.setting=="HD-With-Covariates"){
       out <- runif(1,0,220)
     }
   } else if(censoring.rate==40){
-    if(simu.setting=="1A"){
+    if(simu.setting=="Log-Normal-No-Covariates"){
       out <- runif(1,0,8)
-    } else if(simu.setting=="1B"){
+    } else if(simu.setting=="Log-Normal-With-Covariates"){
       out <- runif(1,0,4)
-    } else if(simu.setting=="2A"){
+    } else if(simu.setting=="HD-No-Covariates"){
       #out <- runif(1,50,90)
       ##out <- runif(1,0,80)
       out <- runif(1,10,100)
-    } else if(simu.setting=="2B"){
+    } else if(simu.setting=="HD-With-Covariates"){
       out <- runif(1,15,100)
     }
   }
@@ -468,7 +468,7 @@ F2 <- function(t,w,z,covariate.dependent){
 ## function to generate T from true F(t)
 #' @import stats
 trueinvFt <- function(p,w,z,simu.setting,covariate.dependent){
-  if(simu.setting =="1A" | simu.setting=="1B"){
+  if(simu.setting =="Log-Normal-No-Covariates" | simu.setting=="Log-Normal-With-Covariates"){
     out <- rep(0,p)
     constant.z <- mult.z(covariate.dependent)
     constant.w <- mult.w(covariate.dependent)
@@ -477,7 +477,7 @@ trueinvFt <- function(p,w,z,simu.setting,covariate.dependent){
       ## Model: log(T)=W+0.5Z+N, so T=exp(W+0.5Z+N)
       out[jj] <- exp(constant.w * w + constant.z * z + rnorm(1,0,sd.use[jj]))
     }
-  } else if(simu.setting=="2A" | simu.setting=="2B"){
+  } else if(simu.setting=="HD-No-Covariates" | simu.setting=="HD-With-Covariates"){
     out <- rep(0,p) ## p=2 (fixed)
 
     ## get constants needed
@@ -563,9 +563,9 @@ w.sample <- function(n){
 gendata.zw <- function(n,simu.setting){
   zz <- rbinom(n,1,0.5)
 
-  if(simu.setting=="1A" | simu.setting=="1B"){
+  if(simu.setting=="Log-Normal-No-Covariates" | simu.setting=="Log-Normal-With-Covariates"){
     ww <- runif(n,0,1)
-  } else if(simu.setting=="2A" | simu.setting=="2B"){
+  } else if(simu.setting=="HD-No-Covariates" | simu.setting=="HD-With-Covariates"){
     ww <- w.sample(n)
     ##ww <- runif(n,30,60)
   }
