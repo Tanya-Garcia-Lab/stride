@@ -8,7 +8,7 @@
 #' @param m number of different mixture proportions, must be at least 2.
 #' @param qvs a numeric matrix of size \code{p} by \code{m} containing all possible
 #' mixture proportions (i.e., the probability of belonging to each population k, k=1,...,p.).
-#' @param censoring.rate a scalar indicating the censoring proportion. Options are 0 or 50.
+#' @param censoring.rate a scalar indicating the censoring proportion. Options are 0 or 40.
 #' @param simu.setting Character indicating simulation setting.
 #' Options are "Log-Normal-No-Covariates", "Log-Normal-With-Covariates", "HD-No-Covariates","HD-With-Covariates".
 #' Setting "Log-Normal-No-Covariates" and "Log-Normal-With-Covariates" refer to simulation setting 1 in Garcia and Parast (2020).
