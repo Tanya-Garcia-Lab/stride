@@ -9,8 +9,10 @@
 #' @param qvs a numeric matrix of size \code{p} by \code{m} containing all possible
 #' mixture proportions (i.e., the probability of belonging to each population k, k=1,...,p.).
 #' @param censoring.rate a scalar indicating the censoring proportion. Options are 0 or 50.
-#' @param simu.setting Character indicating simulation setting. Options are "Log-Normal-No-Covariates", "Log-Normal-With-Covariates", "HD-No-Covariates","HD-With-Covariates".
-#' Setting "Log-Normal-No-Covariates" and "Log-Normal-With-Covariates" refer to Simulation setting 1 in Garcia and Parast (2020), "Log-Normal-No-Covariates" means the
+#' @param simu.setting Character indicating simulation setting.
+#' Options are "Log-Normal-No-Covariates", "Log-Normal-With-Covariates", "HD-No-Covariates","HD-With-Covariates".
+#' Setting "Log-Normal-No-Covariates" and "Log-Normal-With-Covariates" refer to simulation setting 1 in Garcia and Parast (2020).
+#' "Log-Normal-No-Covariates" means the
 #' survival outcomes do NOT depend on the covariates, and "Log-Normal-With-Covariates" means the
 #' survival outcomes do depend on the covariates.
 #' Setting "HD-No-Covariates" and "HD-With-Covariates" refer to Simulation setting 2 in Garcia and Parast (2020), "HD-No-Covariates" means the
@@ -30,8 +32,12 @@
 #' covariate for each person in the sample.}
 #'    \item{zz: }{ a numeric vector of length \code{n} containing the values of the discrete
 #' covariate for each person in the sample.}
-#'    \item{true.groups: }{numeric vector of length \code{n} denoting the population identifier for each person in the sample.}
+#'    \item{true.groups: }{numeric vector of length \code{n} denoting the population identifier for each person in the sample.
+#'    This is for evaluation purposes of our method only.}
 #' }
+#'
+#'@references
+#'Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
 #'
 #'
 #' @export
