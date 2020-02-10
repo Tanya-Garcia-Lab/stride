@@ -37,8 +37,8 @@ ww <- data.gen$ww
 zz <- data.gen$zz
 
 
-## true group membership (needed to compute the AUC/BS for simulated data
-true.groups <- data.gen$true.groups
+## true group membership (needed to compute the AUC/BS for simulated data)
+true.group.identifier <- data.gen$true.group.identifier
 
 ## Perform the estimation
 estimators.out <- stride.estimator(n,m,p,qvs,q,
@@ -51,7 +51,7 @@ estimators.out <- stride.estimator(n,m,p,qvs,q,
 				z.use,w.use,
 				update.qs,
 				know.true.groups,
-				true.groups,
+				true.group.identifier,
 				run.prediction.accuracy,
 				do_cross_validation_AUC_BS)
 
@@ -80,7 +80,7 @@ estimators.out <- stride.estimator(n,m,p,qvs,q,
 #						z.use,w.use,
 #						update.qs,
 #						know.true.groups,
-#						true.groups,
+#						true.group.identifer,
 #						estimator_Ft=estimators.out$Ft.estimate,
 #						estimator_St=estimators.out$St.estimate,
 #						AUC_BS_Ft=estimators.out$Ft.AUC.BS,

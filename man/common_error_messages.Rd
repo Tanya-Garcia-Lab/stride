@@ -24,7 +24,7 @@ common_error_messages(
   w.use,
   update.qs,
   know.true.groups,
-  true.groups,
+  true.group.identifier,
   run.prediction.accuracy
 )
 }
@@ -87,12 +87,12 @@ The values of \code{w.use} must be in the range of the observed \code{ww}.}
 \item{know.true.groups}{logical indicator. If TRUE, then we know the population identifier for each person in the sample.
 This option is only used for simulation studies. Default is FALSE.}
 
-\item{true.groups}{numeric vector of length \code{n} denoting the population identifier for each person in the sample.
+\item{true.group.identifier}{numeric vector of length \code{n} denoting the population identifier for each person in the sample.
 Default is NULL.}
 
 \item{run.prediction.accuracy}{logical indicator. If TRUE, then we compute the prediction accuracy measures, including the
 area under the receiver operating characteristic curve (AUC) and the Brier Score (BS). Prediction accuracy is only valid
-in simulation studies where \code{know.true.groups}=TRUE and \code{true.groups} is available.}
+in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.}
 }
 \value{
 Error or warning messages when input is not appropriate for the methods.

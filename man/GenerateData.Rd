@@ -41,8 +41,8 @@ mixture proportions for each person in the sample.}
 covariate for each person in the sample.}
    \item{zz: }{ a numeric vector of length \code{n} containing the values of the discrete
 covariate for each person in the sample.}
-   \item{true.groups: }{numeric vector of length \code{n} denoting the population identifier for each person in the sample.
-   This is for evaluation purposes of our method only.}
+   \item{true.group.identifier: }{numeric vector of length \code{n} denoting the population identifier for each person in the sample.
+   This is only used simulation study to evaluate the prediction accuracy of our methods.}
 }
 }
 \description{
