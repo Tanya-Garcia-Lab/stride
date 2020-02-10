@@ -74,11 +74,7 @@ GenerateData <- function(n,p,m,qvs,censoring.rate,simu.setting){
     ww <- zw.data$ww
 
     ## set dependence on covariates
-    if(simu.setting=="Log-Normal-No-Covariates" | simu.setting=="HD-No-Covariates"){
-      covariate.dependent <- FALSE
-    } else {
-      covariate.dependent <- TRUE
-    }
+    covariate.dependent <- set.covariate.dependent(simu.setting)
 
 
     for(i in 1:n){
@@ -112,6 +108,18 @@ GenerateData <- function(n,p,m,qvs,censoring.rate,simu.setting){
     }
 
   list(x=x,delta=delta,q=q,ww=ww,zz=zz,true.group.identifier=true.group.identifier)
+}
+
+#########################################
+## Function to set covariate.dependent ##
+########################################
+set.covariate.dependent <- function(simu.setting){
+  if(simu.setting=="Log-Normal-No-Covariates" | simu.setting=="HD-No-Covariates"){
+    covariate.dependent <- FALSE
+  } else {
+    covariate.dependent <- TRUE
+  }
+  return(covariate.dependent)
 }
 
 
@@ -148,11 +156,7 @@ Ft.form <- function(tt,tt0,ww,zz,p,simu.setting){
 	out <- rep(0,p)
 
 	## set dependence on covariates
-	if(simu.setting=="Log-Normal-No-Covariates" | simu.setting=="HD-No-Covariates"){
-	  covariate.dependent <- FALSE
-	} else {
-	  covariate.dependent <- TRUE
-	}
+	covariate.dependent <- set.covariate.dependent(simu.setting)
 
 
 	if(simu.setting == "Log-Normal-No-Covariates" | simu.setting=="Log-Normal-With-Covariates"){
@@ -194,11 +198,7 @@ trueFt <- function(z.use,w.use,tval,tval0,
    out <- Ft.null.theta$null.theta$estimator
 
    ## set dependence on covariates
-   if(simu.setting=="Log-Normal-No-Covariates" | simu.setting=="HD-No-Covariates"){
-     covariate.dependent <- FALSE
-   } else {
-     covariate.dependent <- TRUE
-   }
+   covariate.dependent <- set.covariate.dependent(simu.setting)
 
   ####################
   ## simu setting 1 ##
