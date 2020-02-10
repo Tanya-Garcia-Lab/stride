@@ -43,46 +43,54 @@ This is a basic example which shows you how to solve a common problem:
 library(stride)
 
 # Setup parameters to generate the data
-set.seed(1)
-censoring.rate <- 40
-p <- 2
-n <- 2000
-m <- 4
-tval <- seq(0,80,by=5)  
-tval0 <- c(0,20,30,40,50)
-z.use <- c(0,1)
-w.use <- seq(35,55,by=1)
-run.prediction.accuracy <- TRUE
-update.qs <- FALSE
-simu.setting <- "2A"
-covariate.dependent <- TRUE
-run.NPMLEs <- TRUE
-run.NPNA <- TRUE
-run.OLS <- FALSE
-run.WLS <- FALSE
-run.EFF <- FALSE
-run.NPNA_avg <- FALSE
-run.NPNA_wrong <- FALSE
-do_cross_validation_AUC_BS <- FALSE
-know.true.groups <- TRUE
+set.seed(1)  ## set the random seed generator.
+censoring.rate <- 40  ## set the random censoring rate as 40%
+p <- 2  ## number of population subgroups
+n <- 2000  ## total sample size
+m <- 4  ## number of mixture proportions.
 
+## NOT RUN
+# simu.setting <- "HD-No-Covariates"  ## simulate the distribution functions similar to the Huntington disease study in Garcia and Parast (2020) where the distribution functions do NOT depend on covariates. The GenerateData() function still generates covariates, but the simulated distribution functions do not depend on them.
 
-## compute the finite set of mixture proportions
+simu.setting <- "HD-With-Covariates"  ## simulate the distribution functions similar to the Huntington disease study in Garcia and Parast (2020) where the distribution functions depend on covariates.
+
+## compute the finite set of mixture proportions. We assume the mixture proportions are computed externally.
 qvs <- qvs.values(p,m)
 
 ## generate the data
+data.gen <- GenerateData(n,p,m,qvs,censoring.rate,simu.setting)
+#> Error in trueinvFt(p, ww[i], zz[i], simu.setting, covariate.dependent): object 'out' not found
+x <- data.gen$x  ## possibly censored survival outcomes
+delta <- data.gen$delta  ## censoring indicator, 1= event time observed, 0= event time censored
+q <- data.gen$q  ## mixture proportion for each individual
+ww <- data.gen$ww  ## observed w-covariate for each individual
+zz <- data.gen$zz  ## observed z-covariate for each individual
 
-data.gen <- GenerateData(n,p,m,qvs,censoring.rate,simu.setting,covariate.dependent)
 
-x <- data.gen$x
-delta <- data.gen$delta
-q <- data.gen$q
-ww <- data.gen$ww
-zz <- data.gen$zz
+## Estimation procedures to run to estimate F(t|t0,z,w)
+update.qs <- FALSE ## We do not update the mixture proportions q's. Updating mixture proportions is still in a trial phase.
+run.NPMLEs <- TRUE  ## We run the type I nonparametric maximum likelihood estimator. 
+run.NPNA <- TRUE
+run.NPNA_avg <- FALSE
+run.NPNA_wrong <- FALSE
+run.OLS <- FALSE
+run.WLS <- FALSE
+run.EFF <- FALSE
 
 
+
+## The distribution function we are estimating is F(t|t0,z,w). 
+tval <- seq(0,80,by=5)  ## tval refers to "t" in F(t|t0,z,w) 
+tval0 <- c(0,20,30,40,50) ##tval0 refers to "t0" in F(t|t0,z,w)
+z.use <- c(0,1)  ## z.use refers to "z" in  F(t|t0,z,w)
+w.use <- seq(35,55,by=1)  ## w.use refers to "w" in F(t|t0,z,w)
+
+run.prediction.accuracy <- TRUE
+do_cross_validation_AUC_BS <- FALSE
+know.true.groups <- TRUE
 ## true group membership (needed to compute the AUC/BS for simulated data)
 true.groups <- data.gen$true.groups
+
 
 ## Perform the estimation			
 estimators.out <- stride.estimator(n,m,p,qvs,q,

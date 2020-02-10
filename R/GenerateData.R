@@ -18,7 +18,6 @@
 #' Setting "HD-No-Covariates" and "HD-With-Covariates" refer to Simulation setting 2 in Garcia and Parast (2020), "HD-No-Covariates" means the
 #' survival outcomes do NOT depend on the covariates, and "HD-With-Covariates" means the
 #' survival outcomes do depend on the covariates.
-#' @param covariate.dependent logical indicator. If TRUE, then the survival times depend on covariates.
 #'
 #' @return Returns a list containing
 #' \itemize{
@@ -41,7 +40,7 @@
 #'
 #'
 #' @export
-GenerateData <- function(n,p,m,qvs,censoring.rate,simu.setting,covariate.dependent){
+GenerateData <- function(n,p,m,qvs,censoring.rate,simu.setting){
 
 
   q <- array(0,dim=c(p,n))  ## mixture proportions
@@ -74,6 +73,12 @@ GenerateData <- function(n,p,m,qvs,censoring.rate,simu.setting,covariate.depende
     zz <- zw.data$zz
     ww <- zw.data$ww
 
+    ## set dependence on covariates
+    if(simu.setting=="Log-Normal-No-Covariates" | simu.setting=="HD-No-Covariates"){
+      covariate.dependent <- FALSE
+    } else {
+      covariate.dependent <- TRUE
+    }
 
 
     for(i in 1:n){
