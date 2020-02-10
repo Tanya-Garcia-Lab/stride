@@ -4,7 +4,7 @@
 \alias{GenerateData}
 \title{Generate data}
 \usage{
-GenerateData(n, p, m, qvs, censoring.rate, simu.setting, covariate.dependent)
+GenerateData(n, p, m, qvs, censoring.rate, simu.setting)
 }
 \arguments{
 \item{n}{sample size, must be at least 1.}
@@ -16,17 +16,17 @@ GenerateData(n, p, m, qvs, censoring.rate, simu.setting, covariate.dependent)
 \item{qvs}{a numeric matrix of size \code{p} by \code{m} containing all possible
 mixture proportions (i.e., the probability of belonging to each population k, k=1,...,p.).}
 
-\item{censoring.rate}{a scalar indicating the censoring proportion. Options are 0 or 50.}
+\item{censoring.rate}{a scalar indicating the censoring proportion. Options are 0 or 40.}
 
-\item{simu.setting}{Character indicating simulation setting. Options are "1A", "1B", "2A","2B".
-Setting "1A" and "1B" refer to Simulation setting 1 in Garcia and Parast (2020), "1A" means the
-survival outcomes do NOT depend on the covariates, and "1B" means the
+\item{simu.setting}{Character indicating simulation setting.
+Options are "Log-Normal-No-Covariates", "Log-Normal-With-Covariates", "HD-No-Covariates","HD-With-Covariates".
+Setting "Log-Normal-No-Covariates" and "Log-Normal-With-Covariates" refer to simulation setting 1 in Garcia and Parast (2020).
+"Log-Normal-No-Covariates" means the
+survival outcomes do NOT depend on the covariates, and "Log-Normal-With-Covariates" means the
 survival outcomes do depend on the covariates.
-Setting "2A" and "2B" refer to Simulation setting 2 in Garcia and Parast (2020), "2A" means the
-survival outcomes do NOT depend on the covariates, and "2B" means the
+Setting "HD-No-Covariates" and "HD-With-Covariates" refer to Simulation setting 2 in Garcia and Parast (2020), "HD-No-Covariates" means the
+survival outcomes do NOT depend on the covariates, and "HD-With-Covariates" means the
 survival outcomes do depend on the covariates.}
-
-\item{covariate.dependent}{logical indicator. If TRUE, then the survival times depend on covariates.}
 }
 \value{
 Returns a list containing
@@ -41,10 +41,14 @@ mixture proportions for each person in the sample.}
 covariate for each person in the sample.}
    \item{zz: }{ a numeric vector of length \code{n} containing the values of the discrete
 covariate for each person in the sample.}
-   \item{true.groups: }{numeric vector of length \code{n} denoting the population identifier for each person in the sample.}
+   \item{true.groups: }{numeric vector of length \code{n} denoting the population identifier for each person in the sample.
+   This is for evaluation purposes of our method only.}
 }
 }
 \description{
 Produces data from different populations with the probability of
 belonging to a population. Also produces one discrete covariate and one continuous covariate.
+}
+\references{
+Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
 }

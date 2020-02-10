@@ -59,7 +59,6 @@ qvs <- qvs.values(p,m)
 
 ## generate the data
 data.gen <- GenerateData(n,p,m,qvs,censoring.rate,simu.setting)
-#> Error in trueinvFt(p, ww[i], zz[i], simu.setting, covariate.dependent): object 'out' not found
 x <- data.gen$x  ## possibly censored survival outcomes
 delta <- data.gen$delta  ## censoring indicator, 1= event time observed, 0= event time censored
 q <- data.gen$q  ## mixture proportion for each individual

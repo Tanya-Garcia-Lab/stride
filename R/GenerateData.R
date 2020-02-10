@@ -144,8 +144,17 @@ mult.z <- function(covariate.dependent){
 }
 
 #' @import stats
-Ft.form <- function(tt,tt0,ww,zz,covariate.dependent,p,simu.setting){
+Ft.form <- function(tt,tt0,ww,zz,p,simu.setting){
 	out <- rep(0,p)
+
+	## set dependence on covariates
+	if(simu.setting=="Log-Normal-No-Covariates" | simu.setting=="HD-No-Covariates"){
+	  covariate.dependent <- FALSE
+	} else {
+	  covariate.dependent <- TRUE
+	}
+
+
 	if(simu.setting == "Log-Normal-No-Covariates" | simu.setting=="Log-Normal-With-Covariates"){
 		sd.use <- getsd(p)
       	constant.z <- mult.z(covariate.dependent)
@@ -176,13 +185,20 @@ Ft.form <- function(tt,tt0,ww,zz,covariate.dependent,p,simu.setting){
 
 ## Function to produce true F(t)
 trueFt <- function(z.use,w.use,tval,tval0,
-			p,real_data,simu.setting,covariate.dependent,
+			p,real_data,simu.setting,
 			Ft.null.theta, method.label){
 
    ## storage
    ##out <- Ft.null.theta$null.theta.nomethod
 
    out <- Ft.null.theta$null.theta$estimator
+
+   ## set dependence on covariates
+   if(simu.setting=="Log-Normal-No-Covariates" | simu.setting=="HD-No-Covariates"){
+     covariate.dependent <- FALSE
+   } else {
+     covariate.dependent <- TRUE
+   }
 
   ####################
   ## simu setting 1 ##
@@ -216,8 +232,7 @@ trueFt <- function(z.use,w.use,tval,tval0,
 					  for(ww in 1:length(w.use)){
 						out[ee,tt,tt0,zz,ww,] <-
 							Ft.form(tval[tt],tval0[tt0],
-							w.use[ww],z.use[zz],
-							covariate.dependent,p,simu.setting)
+							w.use[ww],z.use[zz],p,simu.setting)
 				  	 }
 				  }
 			    } else {
@@ -233,7 +248,7 @@ trueFt <- function(z.use,w.use,tval,tval0,
 				  for(ii in 1:length(zz.tmp)){
 					 avg.tmp <- avg.tmp + Ft.form(tval[tt],tval0[tt0],
 							ww.tmp[ii],zz.tmp[ii],
-							covariate.dependent,p,simu.setting)
+							p,simu.setting)
 				  }
 
 				  ## report the avg
