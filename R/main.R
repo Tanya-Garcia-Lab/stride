@@ -20,7 +20,7 @@ stride.estimator.wrapper <- function(
   z.use,w.use,
   update.qs=FALSE,
   know.true.groups=FALSE,
-  true.groups=NULL,
+  true.group.identifier=NULL,
   run.prediction.accuracy=FALSE,
   do_cross_validation_AUC_BS=FALSE){
 
@@ -37,7 +37,7 @@ stride.estimator.wrapper <- function(
                         z.use,w.use,
                         update.qs,
                         know.true.groups,
-                        true.groups,
+                        true.group.identifier,
                         run.prediction.accuracy)
 
 
@@ -68,7 +68,7 @@ stride.estimator.wrapper <- function(
   data <- make.data.set(
     n,m,p,qvs,q,
     x,delta,ww,zz,
-    know.true.groups,true.groups)
+    know.true.groups,true.group.identifier)
 
 
 
@@ -137,11 +137,11 @@ stride.estimator.wrapper <- function(
 #' @param update.qs logical indicator. If TRUE, the mixture proportions \code{q} will be updated. This is currently not implemented.
 #' @param know.true.groups logical indicator. If TRUE, then we know the population identifier for each person in the sample.
 #' This option is only used for simulation studies. Default is FALSE.
-#' @param true.groups numeric vector of length \code{n} denoting the population identifier for each person in the sample.
+#' @param true.group.identifier numeric vector of length \code{n} denoting the population identifier for each person in the sample.
 #' Default is NULL.
 #' @param run.prediction.accuracy logical indicator. If TRUE, then we compute the prediction accuracy measures, including the
 #' area under the receiver operating characteristic curve (AUC) and the Brier Score (BS). Prediction accuracy is only valid
-#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.groups} is available.
+#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
 #'
 #' @return Error or warning messages when input is not appropriate for the methods.
 #' @export
@@ -155,7 +155,7 @@ common_error_messages <- function(n,m,p,qvs,q,
                                   z.use,w.use,
                                   update.qs,
                                   know.true.groups,
-                                  true.groups,
+                                  true.group.identifier,
                                   run.prediction.accuracy)
 {
   ## check if n>=1
@@ -214,14 +214,14 @@ common_error_messages <- function(n,m,p,qvs,q,
   }
 
   ## data needed when know.true.groups=TRUE
-  if(know.true.groups==TRUE & is.null(true.groups)){
-    stop("User must provide true.groups.")
+  if(know.true.groups==TRUE & is.null(true.group.identifier)){
+    stop("User must provide true.group.identifier.")
   }
 
   if(run.prediction.accuracy==TRUE){
-    if(know.true.groups==FALSE | is.null(true.groups)){
+    if(know.true.groups==FALSE | is.null(true.group.identifier)){
       stop("To run prediction accuracy, user must set
-           know.true.groups=TRUE and provide true.groups.")
+           know.true.groups=TRUE and provide true.group.identifier.")
     }
 
     }
@@ -277,15 +277,15 @@ common_error_messages <- function(n,m,p,qvs,q,
 #' The values of \code{w.use} must be in the range of the observed \code{ww}.
 #' @param update.qs logical indicator. If TRUE, the mixture proportions \code{q} will be updated. This is currently not implemented.
 #' @param know.true.groups logical indicator. If TRUE, then we know the population identifier for each person in the sample.
-#' This option is only used for simulation studies. Default is FALSE.
-#' @param true.groups numeric vector of length \code{n} denoting the population identifier for each person in the sample.
+#' This option is only used for simulation studies to check prediction accuracy. Default is FALSE.
+#' @param true.group.identifier numeric vector of length \code{n} denoting the population identifier for each person in the sample.
 #' Default is NULL.
 #' @param run.prediction.accuracy logical indicator. If TRUE, then we compute the prediction accuracy measures, including the
 #' area under the receiver operating characteristic curve (AUC) and the Brier Score (BS). Prediction accuracy is only valid
-#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.groups} is available.
+#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
 #' @param do_cross_validation_AUC_BS logical indicator. If TRUE, then we compute the prediction accuracy measures, including the
 #' area under the receiver operating characteristic curve (AUC) and the Brier Score (BS) using cross-validation. Prediction accuracy is only valid
-#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.groups} is available.
+#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
 #'
 #' @section Details:
 #' We estimate the distribution function for mixture data  where
@@ -362,8 +362,8 @@ stride.estimator <- function(n,m,p,qvs,q,
                               tval,tval0,
                               z.use,w.use,
                               update.qs,
-                              know.true.groups,
-                              true.groups,
+                              know.true.groups=FALSE,
+                              true.group.identifier=NULL,
                               run.prediction.accuracy,
                               do_cross_validation_AUC_BS){
 
@@ -381,7 +381,7 @@ stride.estimator <- function(n,m,p,qvs,q,
     z.use,w.use,
     update.qs,
     know.true.groups,
-    true.groups,
+    true.group.identifier,
     run.prediction.accuracy=FALSE,
     do_cross_validation_AUC_BS=FALSE
   )
@@ -410,7 +410,7 @@ stride.estimator <- function(n,m,p,qvs,q,
         z.use,w.use,
         update.qs,
         know.true.groups,
-        true.groups,
+        true.group.identifier,
         run.prediction.accuracy,
         do_cross_validation_AUC_BS)
 
@@ -497,14 +497,14 @@ stride.estimator <- function(n,m,p,qvs,q,
 #'    Results are only valid when \eqn{t\geq t_0}, so
 #'    arrays show NA for any combination for which \eqn{t<t_0}.
 #'
-#' @param true.groups numeric vector of length \code{n} denoting the population identifier for each person in the sample.
+#' @param true.group.identifier numeric vector of length \code{n} denoting the population identifier for each person in the sample.
 #' Default is NULL.
 #' @param run.prediction.accuracy logical indicator. If TRUE, then we compute the prediction accuracy measures, including the
 #' area under the receiver operating characteristic curve (AUC) and the Brier Score (BS). Prediction accuracy is only valid
-#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.groups} is available.
+#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
 #' @param do_cross_validation_AUC_BS logical indicator. If TRUE, then we compute the prediction accuracy measures, including the
 #' area under the receiver operating characteristic curve (AUC) and the Brier Score (BS) using cross-validation. Prediction accuracy is only valid
-#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.groups} is available.
+#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
 #'
 #' @return \code{stride.bootstrap.variance} returns a list containing
 #' \itemize{
@@ -567,7 +567,7 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
                                        z.use,w.use,
                                        update.qs,
                                        know.true.groups,
-                                       true.groups,
+                                       true.group.identifier,
                                        estimator_Ft,
                                        estimator_St,
                                        AUC_BS_Ft,
@@ -589,7 +589,7 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
                         z.use,w.use,
                         update.qs,
                         know.true.groups,
-                        true.groups,
+                        true.group.identifier,
                         run.prediction.accuracy)
 
   ##############################
@@ -729,7 +729,7 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
     delta.boot <- delta[mysamp]
     ww.boot <- ww[mysamp]
     zz.boot <- zz[mysamp]
-    true.groups.boot <- true.groups[mysamp]
+    true.group.identifier.boot <- true.group.identifier[mysamp]
     q.boot <- q[,mysamp]
 
     ## get new qvs
@@ -763,7 +763,7 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
       z.use,w.use,
       update.qs,
       know.true.groups,
-      true.groups,
+      true.group.identifier.boot,
       run.prediction.accuracy,
       do_cross_validation_AUC_BS)
 
@@ -872,18 +872,18 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
 #' covariate for each person in the sample.
 #' @param know.true.groups logical indicator. If TRUE, then we know the population identifier for each person in the sample.
 #' This option is only used for simulation studies. Default is FALSE.
-#' @param true.groups numeric vector of length \code{n} denoting the population identifier for each person in the sample.
+#' @param true.group.identifier numeric vector of length \code{n} denoting the population identifier for each person in the sample.
 #' Default is NULL.
 #'
 #' @return a matrix of the concatenated data. The columns are "x", "delta", "q1" to "qp" (correspond to the mixture proportions),
 #' "w" (for \code{ww}), "z" (for \code{zz}), "uset" (for "u-set" meaning the uth mixture proportion group), and
-#' "group" (for the true population group as defined by \code{true.groups}). If \code{know.true.groups} is
+#' "group" (for the true population group as defined by \code{true.group.identifier}). If \code{know.true.groups} is
 #' FALSE, then the column "group" is a vector of 0's.
 
 make.data.set <- function(
   n,m,p,qvs,q,
   x,delta,ww,zz,
-  know.true.groups,true.groups){
+  know.true.groups,true.group.identifier){
 
   #####################
   ## Compute u-group ##
@@ -891,10 +891,10 @@ make.data.set <- function(
   uset <- compute.uset(n,m,p,qvs,q)
 
   if(know.true.groups==FALSE){
-    true.groups <- rep(0,length(delta))
+    true.group.identifier <- rep(0,length(delta))
   }
 
-  data <- data.frame(x=x,delta=delta,t(q),ww,zz,uset,true.groups)
+  data <- data.frame(x=x,delta=delta,t(q),ww,zz,uset,true.group.identifier)
   colnames(data) <- c("x","delta",paste("q",1:p,sep=""),"w","z","uset","group")
 
   ## sort in increasing order by x
@@ -936,10 +936,10 @@ sum_array_na <- function(m1,m2){
 #' @param update.qs logical indicator. If TRUE, the mixture proportions \code{q} will be updated. This is currently not implemented.
 #' @param run.prediction.accuracy logical indicator. If TRUE, then we compute the prediction accuracy measures, including the
 #' area under the receiver operating characteristic curve (AUC) and the Brier Score (BS). Prediction accuracy is only valid
-#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.groups} is available.
+#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
 #' @param do_cross_validation_AUC_BS logical indicator. If TRUE, then we compute the prediction accuracy measures, including the
 #' area under the receiver operating characteristic curve (AUC) and the Brier Score (BS) using cross-validation. Prediction accuracy is only valid
-#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.groups} is available.
+#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
 #'
 #' @section Details:
 #' We estimate the distribution function for mixture data  where

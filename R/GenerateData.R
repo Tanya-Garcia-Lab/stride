@@ -31,8 +31,8 @@
 #' covariate for each person in the sample.}
 #'    \item{zz: }{ a numeric vector of length \code{n} containing the values of the discrete
 #' covariate for each person in the sample.}
-#'    \item{true.groups: }{numeric vector of length \code{n} denoting the population identifier for each person in the sample.
-#'    This is for evaluation purposes of our method only.}
+#'    \item{true.group.identifier: }{numeric vector of length \code{n} denoting the population identifier for each person in the sample.
+#'    This is only used simulation study to evaluate the prediction accuracy of our methods.}
 #' }
 #'
 #'@references
@@ -48,7 +48,7 @@ GenerateData <- function(n,p,m,qvs,censoring.rate,simu.setting){
   delta <- rep(0,n)	    ## censoring indicator
   uset <- rep(0,n)	    ## indicator of which subgroup qvs
   r <- rep(0,m)		    ## number in each qvs subgroup
-  true.groups <- rep(0,n)   ## to which group each person belongs
+  true.group.identifier <- rep(0,n)   ## to which group each person belongs
 
   ###################
   ## Simulate data ##
@@ -98,7 +98,7 @@ GenerateData <- function(n,p,m,qvs,censoring.rate,simu.setting){
       while(j <= p){
         if(a <= tmp){
           s <- t1[j]
-	  true.groups[i] <- j
+	  true.group.identifier[i] <- j
 	  j <- p+1
         } else {
           tmp <- tmp + q1[j+1]
@@ -111,7 +111,7 @@ GenerateData <- function(n,p,m,qvs,censoring.rate,simu.setting){
       delta[i] <- which.min(c(cens,s)) - 1
     }
 
-  list(x=x,delta=delta,q=q,ww=ww,zz=zz,true.groups=true.groups)
+  list(x=x,delta=delta,q=q,ww=ww,zz=zz,true.group.identifier=true.group.identifier)
 }
 
 

@@ -83,18 +83,18 @@ run.WLS <- FALSE
 run.EFF <- FALSE
 
 
-
 ## The distribution function we are estimating is F(t|t0,z,w). 
 tval <- seq(0,80,by=5)  ## tval refers to "t" in F(t|t0,z,w) 
 tval0 <- c(0,20,30,40,50) ##tval0 refers to "t0" in F(t|t0,z,w)
 z.use <- c(0,1)  ## z.use refers to "z" in  F(t|t0,z,w)
 w.use <- seq(35,55,by=1)  ## w.use refers to "w" in F(t|t0,z,w)
 
-run.prediction.accuracy <- TRUE
+## Setup to compute AUC/BS as in Garcia and Parast (2020). Only for simulated data.
+## We compute the prediction accuracy measures, including the area under the receiver operating characteristic curve (AUC) and the Brier Score (BS). Prediction accuracy is only valid in simulation studies where know.true.groups=TRUE and true.group.identifier is available.
+run.prediction.accuracy <- TRUE  
 do_cross_validation_AUC_BS <- FALSE
 know.true.groups <- TRUE
-## true group membership (needed to compute the AUC/BS for simulated data)
-true.groups <- data.gen$true.groups
+true.group.identifier <- data.gen$true.group.identifier
 
 
 ## Perform the estimation			
@@ -108,7 +108,7 @@ estimators.out <- stride.estimator(n,m,p,qvs,q,
 				z.use,w.use,
 				update.qs,
 				know.true.groups,
-				true.groups,
+				true.group.identifier,
 				run.prediction.accuracy,
 				do_cross_validation_AUC_BS)
 ```
