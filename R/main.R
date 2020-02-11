@@ -1203,9 +1203,9 @@ estimator.main <- function(data,
           ###########################################
           if(tval[tt] > tval0[tt0]){
 
-            ####################
-            ## NPMLE estimator ##
-            ####################
+            ##################################
+            ## NPMLE,OLS,WLS, EFF estimator ##
+            ##################################
 
             if(!grepl("NPNA*",method.label[kk])){
               ## run kin-cohort estimator
@@ -1229,8 +1229,6 @@ estimator.main <- function(data,
                   (1-kin.out0$hts0)
 
                 mySout <- 1- myHout
-                Sout_test_out[,paste("St",1:m,sep="")] <-
-                  rep.row(mySout,nrow(Sout_test_out))
 
                 ## F(t|t0,z,w)
                 u.tmp <- t(qvs.tmp)
@@ -1238,8 +1236,17 @@ estimator.main <- function(data,
                 myFest <- solve(t(u.tmp) %*% diag(r.tmp) %*% u.tmp) %*%
                   t(u.tmp) %*% diag(r.tmp) %*% myHout
 
-                Ft_test_out[,paste("Ft",1:p,sep="")] <- rep.row(myFest,nrow(Ft_test_out))
+              } else{
+                myFest <- (kin.out$Fest[,method.label[kk]]-kin.out0$Fest[,method.label[kk]])/
+                            (1-kin.out0$Fest[,method.label[kk]])
+
+                ## We put 0's for Sout_test_out. We do  not compute this for OLS, WLS, EFF, NPMLE2 estimators
+                mySout <- rep(0,m.tmp)
               }
+              ## Repeat the estimates for Ft and St since these are the same for all covariate values.
+              Ft_test_out[,paste("Ft",1:p,sep="")] <- rep.row(myFest,nrow(Ft_test_out))
+
+              Sout_test_out[,paste("St",1:m,sep="")] <- rep.row(mySout,nrow(Sout_test_out))
 
 
 
