@@ -18,6 +18,9 @@ common_error_messages(
   run.NPNA,
   run.NPNA_avg,
   run.NPNA_wrong,
+  run.OLS,
+  run.WLS,
+  run.EFF,
   tval,
   tval0,
   z.use,
@@ -54,21 +57,38 @@ covariate for each person in the sample.}
 covariate for each person in the sample.}
 
 \item{run.NPMLEs}{a logical indicator. If TRUE, then the output includes the
-estimated distribution function for mixture data based on the type-I nonparametric maximum likelihood
-estimator. This is referred to as the "Kaplan-Meier" estimator in the reference paper, and does
-not include covariates nor dynamic landmarking.}
+estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
+estimators. The type I nonparametric maximum likelihood estimator is referred
+to as the "Kaplan-Meier" estimator in Garcia and Parast (2020). Neither the type I nor type II
+include covariates or dynamic landmarking.}
 
 \item{run.NPNA}{a logical indicator. If TRUE, then the output includes the
 estimated distribution function for mixture data that accounts for covariates and dynamic
-landmarking. This estimator is called "NPNA" in the referenced paper.}
+landmarking. This estimator is called "NPNA" in Garcia and Parast (2020).}
 
 \item{run.NPNA_avg}{a logical indicator. If TRUE, then the output includes the
 estimated distribution function for mixture data that averages out over the observed covariates.
-This is referred to as NPNA_marg in the referenced paper.}
+This is referred to as NPNA_marg in Garcia and Parast (2020).}
 
 \item{run.NPNA_wrong}{a logical indicator. If TRUE, then the output includes the
 estimated distribution function for mixture data that ignores landmarking. This is referred to as
 NPNA_{t_0=0} in the paper.}
+
+\item{run.OLS}{a logical indicator. If TRUE, then the output includes the estimated distribution function
+computed using an ordinary least squares influence function that adjusts for censoring using
+inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.}
+
+\item{run.WLS}{a logical indicator. If TRUE, then the output includes the estimated distribution function
+computed using a weighted least squares influence function that adjusts for censoring using
+inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.}
+
+\item{run.EFF}{a logical indicator. If TRUE, then the output includes the estimated distribution function
+computed using the efficient influence function based on Hilbert space projection theory results.
+The estimator adjusts for censoring using
+inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.}
 
 \item{tval}{numeric vector of time points at which the distribution function is evaluated, all values must
 be non-negative.}
@@ -99,4 +119,18 @@ Error or warning messages when input is not appropriate for the methods.
 }
 \description{
 Function to check for common errors in the input.
+}
+\references{
+Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
+
+Garcia, T.P., Marder, K. and Wang, Y. (2017). Statistical modeling of Huntington disease onset.
+In Handbook of Clinical Neurology, vol 144, 3rd Series, editors Andrew Feigin and Karen E. Anderson.
+
+Qing, J., Garcia, T.P., Ma, Y., Tang, M.X., Marder, K., and Wang, Y. (2014).
+Combining isotonic regression and EM algorithm to predict genetic risk under monotonicity constraint.
+Annals of Applied Statistics, 8(2), 1182-1208.
+
+Wang, Y., Garcia, T.P., and Ma. Y. (2012).  Nonparametric estimation for censored mixture data with
+application to the Cooperative Huntington's Observational Research Trial. Journal of the American Statistical Association,
+107, 1324-1338.
 }
