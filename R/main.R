@@ -16,6 +16,9 @@ stride.estimator.wrapper <- function(
   run.NPNA,
   run.NPNA_avg,
   run.NPNA_wrong,
+  run.OLS,
+  run.WLS,
+  run.EFF,
   tval,tval0,
   z.use,w.use,
   update.qs=FALSE,
@@ -33,6 +36,9 @@ stride.estimator.wrapper <- function(
                         run.NPNA,
                         run.NPNA_avg,
                         run.NPNA_wrong,
+                        run.OLS,
+                        run.WLS,
+                        run.EFF,
                         tval,tval0,
                         z.use,w.use,
                         update.qs,
@@ -49,7 +55,10 @@ stride.estimator.wrapper <- function(
   est.names <- get_method_label(run.NPMLEs,
                                 run.NPNA,
                                 run.NPNA_avg,
-                                run.NPNA_wrong
+                                run.NPNA_wrong,
+                                run.OLS,
+                                run.WLS,
+                                run.EFF
   )
 
   method.label <- est.names
@@ -114,18 +123,32 @@ stride.estimator.wrapper <- function(
 #' @param zz a numeric vector of length \code{n} containing the values of the discrete
 #' covariate for each person in the sample.
 #' @param run.NPMLEs a logical indicator. If TRUE, then the output includes the
-#' estimated distribution function for mixture data based on the type-I nonparametric maximum likelihood
-#' estimator. This is referred to as the "Kaplan-Meier" estimator in the reference paper, and does
-#' not include covariates nor dynamic landmarking.
+#' estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
+#' estimators. The type I nonparametric maximum likelihood estimator is referred
+#' to as the "Kaplan-Meier" estimator in Garcia and Parast (2020). Neither the type I nor type II
+#' include covariates or dynamic landmarking.
 #' @param run.NPNA a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that accounts for covariates and dynamic
-#' landmarking. This estimator is called "NPNA" in the referenced paper.
+#' landmarking. This estimator is called "NPNA" in Garcia and Parast (2020).
 #' @param run.NPNA_avg a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that averages out over the observed covariates.
-#' This is referred to as NPNA_marg in the referenced paper.
+#' This is referred to as NPNA_marg in Garcia and Parast (2020).
 #' @param run.NPNA_wrong a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that ignores landmarking. This is referred to as
 #' NPNA_{t_0=0} in the paper.
+#' @param run.OLS a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using an ordinary least squares influence function that adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' @param run.WLS  a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using a weighted least squares influence function that adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' @param run.EFF  a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using the efficient influence function based on Hilbert space projection theory results.
+#' The estimator adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
 #' @param tval numeric vector of time points at which the distribution function is evaluated, all values must
 #' be non-negative.
 #' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
@@ -143,6 +166,20 @@ stride.estimator.wrapper <- function(
 #' area under the receiver operating characteristic curve (AUC) and the Brier Score (BS). Prediction accuracy is only valid
 #' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
 #'
+#' @references
+#' Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
+#'
+#' Garcia, T.P., Marder, K. and Wang, Y. (2017). Statistical modeling of Huntington disease onset.
+#' In Handbook of Clinical Neurology, vol 144, 3rd Series, editors Andrew Feigin and Karen E. Anderson.
+#'
+#' Qing, J., Garcia, T.P., Ma, Y., Tang, M.X., Marder, K., and Wang, Y. (2014).
+#' Combining isotonic regression and EM algorithm to predict genetic risk under monotonicity constraint.
+#' Annals of Applied Statistics, 8(2), 1182-1208.
+#'
+#' Wang, Y., Garcia, T.P., and Ma. Y. (2012).  Nonparametric estimation for censored mixture data with
+#' application to the Cooperative Huntington's Observational Research Trial. Journal of the American Statistical Association,
+#' 107, 1324-1338.
+#'
 #' @return Error or warning messages when input is not appropriate for the methods.
 #' @export
 common_error_messages <- function(n,m,p,qvs,q,
@@ -151,6 +188,9 @@ common_error_messages <- function(n,m,p,qvs,q,
                                   run.NPNA,
                                   run.NPNA_avg,
                                   run.NPNA_wrong,
+                                  run.OLS,
+                                  run.WLS,
+                                  run.EFF,
                                   tval,tval0,
                                   z.use,w.use,
                                   update.qs,
@@ -226,7 +266,8 @@ common_error_messages <- function(n,m,p,qvs,q,
 
     }
 
-  if(!any(c(run.NPMLEs,run.NPNA,run.NPNA_avg,run.NPNA_wrong))){
+  if(!any(c(run.NPMLEs,run.NPNA,run.NPNA_avg,run.NPNA_wrong,
+            run.OLS,run.WLS,run.EFF))){
     stop("No methods are set to run.")
   }
 }
@@ -255,18 +296,32 @@ common_error_messages <- function(n,m,p,qvs,q,
 #' @param zz a numeric vector of length \code{n} containing the values of the discrete
 #' covariate for each person in the sample.
 #' @param run.NPMLEs a logical indicator. If TRUE, then the output includes the
-#' estimated distribution function for mixture data based on the type-I nonparametric maximum likelihood
-#' estimator. This is referred to as the "Kaplan-Meier" estimator in the reference paper, and does
-#' not include covariates nor dynamic landmarking.
+#' estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
+#' estimators. The type I nonparametric maximum likelihood estimator is referred
+#' to as the "Kaplan-Meier" estimator in Garcia and Parast (2020). Neither the type I nor type II
+#' include covariates or dynamic landmarking.
 #' @param run.NPNA a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that accounts for covariates and dynamic
-#' landmarking. This estimator is called "NPNA" in the referenced paper.
+#' landmarking. This estimator is called "NPNA" in Garcia and Parast (2020).
 #' @param run.NPNA_avg a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that averages out over the observed covariates.
-#' This is referred to as NPNA_marg in the referenced paper.
+#' This is referred to as NPNA_marg in Garcia and Parast (2020)..
 #' @param run.NPNA_wrong a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that ignores landmarking. This is referred to as
 #' NPNA_{t_0=0} in the paper.
+#' @param run.OLS a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using an ordinary least squares influence function that adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' @param run.WLS  a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using a weighted least squares influence function that adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' @param run.EFF  a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using the efficient influence function based on Hilbert space projection theory results.
+#' The estimator adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
 #' @param tval numeric vector of time points at which the distribution function is evaluated, all values must
 #' be non-negative.
 #' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
@@ -298,7 +353,18 @@ common_error_messages <- function(n,m,p,qvs,q,
 #' where \eqn{t_0} are the time points in \code{tval0}.
 #'
 #' @references
-#' Garcia, T.P. and Parast, L. (2019+). Dynamic landmark prediction for mixture data.
+#' Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
+#'
+#' Garcia, T.P., Marder, K. and Wang, Y. (2017). Statistical modeling of Huntington disease onset.
+#' In Handbook of Clinical Neurology, vol 144, 3rd Series, editors Andrew Feigin and Karen E. Anderson.
+#'
+#' Qing, J., Garcia, T.P., Ma, Y., Tang, M.X., Marder, K., and Wang, Y. (2014).
+#' Combining isotonic regression and EM algorithm to predict genetic risk under monotonicity constraint.
+#' Annals of Applied Statistics, 8(2), 1182-1208.
+#'
+#' Wang, Y., Garcia, T.P., and Ma. Y. (2012).  Nonparametric estimation for censored mixture data with
+#' application to the Cooperative Huntington's Observational Research Trial. Journal of the American Statistical Association,
+#' 107, 1324-1338.
 #'
 #'
 #' @return \code{stride.estimator} returns a list containing
@@ -359,6 +425,9 @@ stride.estimator <- function(n,m,p,qvs,q,
                               run.NPNA,
                               run.NPNA_avg,
                               run.NPNA_wrong,
+                              run.OLS,
+                              run.WLS,
+                              run.EFF,
                               tval,tval0,
                               z.use,w.use,
                               update.qs,
@@ -377,6 +446,9 @@ stride.estimator <- function(n,m,p,qvs,q,
     run.NPNA,
     run.NPNA_avg,
     run.NPNA_wrong,
+    run.OLS,
+    run.WLS,
+    run.EFF,
     tval,tval0,
     z.use,w.use,
     update.qs,
@@ -406,6 +478,9 @@ stride.estimator <- function(n,m,p,qvs,q,
         run.NPNA,
         run.NPNA_avg,
         run.NPNA_wrong,
+        run.OLS,
+        run.WLS,
+        run.EFF,
         tval,tval0,
         z.use,w.use,
         update.qs,
@@ -453,18 +528,32 @@ stride.estimator <- function(n,m,p,qvs,q,
 #' @param zz a numeric vector of length \code{n} containing the values of the discrete
 #' covariate for each person in the sample.
 #' @param run.NPMLEs a logical indicator. If TRUE, then the output includes the
-#' estimated distribution function for mixture data based on the type-I nonparametric maximum likelihood
-#' estimator. This is referred to as the "Kaplan-Meier" estimator in the reference paper, and does
-#' not include covariates nor dynamic landmarking.
+#' estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
+#' estimators. The type I nonparametric maximum likelihood estimator is referred
+#' to as the "Kaplan-Meier" estimator in Garcia and Parast (2020). Neither the type I nor type II
+#' include covariates or dynamic landmarking.
 #' @param run.NPNA a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that accounts for covariates and dynamic
-#' landmarking. This estimator is called "NPNA" in the referenced paper.
+#' landmarking. This estimator is called "NPNA" in Garcia and Parast (2020).
 #' @param run.NPNA_avg a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that averages out over the observed covariates.
-#' This is referred to as NPNA_marg in the referenced paper.
+#' This is referred to as NPNA_marg in Garcia and Parast (2020).
 #' @param run.NPNA_wrong a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that ignores landmarking. This is referred to as
 #' NPNA_{t_0=0} in the paper.
+#' @param run.OLS a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using an ordinary least squares influence function that adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' @param run.WLS  a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using a weighted least squares influence function that adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' @param run.EFF  a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using the efficient influence function based on Hilbert space projection theory results.
+#' The estimator adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
 #' @param tval numeric vector of time points at which the distribution function is evaluated, all values must
 #' be non-negative.
 #' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
@@ -505,6 +594,20 @@ stride.estimator <- function(n,m,p,qvs,q,
 #' @param do_cross_validation_AUC_BS logical indicator. If TRUE, then we compute the prediction accuracy measures, including the
 #' area under the receiver operating characteristic curve (AUC) and the Brier Score (BS) using cross-validation. Prediction accuracy is only valid
 #' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
+#'
+#' @references
+#' Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
+#'
+#' Garcia, T.P., Marder, K. and Wang, Y. (2017). Statistical modeling of Huntington disease onset.
+#' In Handbook of Clinical Neurology, vol 144, 3rd Series, editors Andrew Feigin and Karen E. Anderson.
+#'
+#' Qing, J., Garcia, T.P., Ma, Y., Tang, M.X., Marder, K., and Wang, Y. (2014).
+#' Combining isotonic regression and EM algorithm to predict genetic risk under monotonicity constraint.
+#' Annals of Applied Statistics, 8(2), 1182-1208.
+#'
+#' Wang, Y., Garcia, T.P., and Ma. Y. (2012).  Nonparametric estimation for censored mixture data with
+#' application to the Cooperative Huntington's Observational Research Trial. Journal of the American Statistical Association,
+#' 107, 1324-1338.
 #'
 #' @return \code{stride.bootstrap.variance} returns a list containing
 #' \itemize{
@@ -563,6 +666,9 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
                                        run.NPNA,
                                        run.NPNA_avg,
                                        run.NPNA_wrong,
+                                       run.OLS,
+                                       run.WLS,
+                                       run.EFF,
                                        tval,tval0,
                                        z.use,w.use,
                                        update.qs,
@@ -585,6 +691,9 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
                         run.NPNA,
                         run.NPNA_avg,
                         run.NPNA_wrong,
+                        run.OLS,
+                        run.WLS,
+                        run.EFF,
                         tval,tval0,
                         z.use,w.use,
                         update.qs,
@@ -598,7 +707,10 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
   est.names <- get_method_label(run.NPMLEs,
                                 run.NPNA,
                                 run.NPNA_avg,
-                                run.NPNA_wrong)
+                                run.NPNA_wrong,
+                                run.OLS,
+                                run.WLS,
+                                run.EFF)
 
 
 
@@ -759,6 +871,9 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
       run.NPNA,
       run.NPNA_avg,
       run.NPNA_wrong,
+      run.OLS,
+      run.WLS,
+      run.EFF,
       tval,tval0,
       z.use,w.use,
       update.qs,
@@ -952,7 +1067,18 @@ sum_array_na <- function(m1,m2){
 #' where \eqn{t_0} are the time points in \code{tval0}.
 #'
 #' @references
-#' Garcia, T.P. and Parast, L. (2019+). Dynamic landmark prediction for mixture data.
+#' Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
+#'
+#' Garcia, T.P., Marder, K. and Wang, Y. (2017). Statistical modeling of Huntington disease onset.
+#' In Handbook of Clinical Neurology, vol 144, 3rd Series, editors Andrew Feigin and Karen E. Anderson.
+#'
+#' Qing, J., Garcia, T.P., Ma, Y., Tang, M.X., Marder, K., and Wang, Y. (2014).
+#' Combining isotonic regression and EM algorithm to predict genetic risk under monotonicity constraint.
+#' Annals of Applied Statistics, 8(2), 1182-1208.
+#'
+#' Wang, Y., Garcia, T.P., and Ma. Y. (2012).  Nonparametric estimation for censored mixture data with
+#' application to the Cooperative Huntington's Observational Research Trial. Journal of the American Statistical Association,
+#' 107, 1324-1338.
 #'
 #'
 #' @return \code{estimator.main} returns a list containing
@@ -1401,42 +1527,71 @@ estimator.main <- function(data,
 #' Creates character vector of method names.
 #'
 #' @param run.NPMLEs a logical indicator. If TRUE, then the output includes the
-#' estimated distribution function for mixture data based on the type-I nonparametric maximum likelihood
-#' estimator. This is referred to as the "Kaplan-Meier" estimator in the reference paper, and does
-#' not include covariates nor dynamic landmarking.
+#' estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
+#' estimators. The type I nonparametric maximum likelihood estimator is referred
+#' to as the "Kaplan-Meier" estimator in Garcia and Parast (2020). Neither the type I nor type II
+#' include covariates or dynamic landmarking.
 #' @param run.NPNA a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that accounts for covariates and dynamic
-#' landmarking. This estimator is called "NPNA" in the referenced paper.
+#' landmarking. This estimator is called "NPNA" in Garcia and Parast (2020).
 #' @param run.NPNA_avg a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that averages out over the observed covariates.
-#' This is referred to as NPNA_marg in the referenced paper.
+#' This is referred to as NPNA_marg in Garcia and Parast (2020).
 #' @param run.NPNA_wrong a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that ignores landmarking. This is referred to as
 #' NPNA_{t_0=0} in the paper.
+#' @param run.OLS a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using an ordinary least squares influence function that adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' @param run.WLS  a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using a weighted least squares influence function that adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' @param run.EFF  a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using the efficient influence function based on Hilbert space projection theory results.
+#' The estimator adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#'
+#' @references
+#' Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
+#'
+#' Garcia, T.P., Marder, K. and Wang, Y. (2017). Statistical modeling of Huntington disease onset.
+#' In Handbook of Clinical Neurology, vol 144, 3rd Series, editors Andrew Feigin and Karen E. Anderson.
+#'
+#' Qing, J., Garcia, T.P., Ma, Y., Tang, M.X., Marder, K., and Wang, Y. (2014).
+#' Combining isotonic regression and EM algorithm to predict genetic risk under monotonicity constraint.
+#' Annals of Applied Statistics, 8(2), 1182-1208.
+#'
+#' Wang, Y., Garcia, T.P., and Ma. Y. (2012).  Nonparametric estimation for censored mixture data with
+#' application to the Cooperative Huntington's Observational Research Trial. Journal of the American Statistical Association,
+#' 107, 1324-1338.
 #'
 #' @return A character vector of method names. If \code{run.NPMLEs} is TRUE,
-#' the character vector includes "NPMLE1". If \code{run.NPNA} is TRUE,
+#' the character vector includes "NPMLE1" and "NPMLE2". If \code{run.NPNA} is TRUE,
 #' the character vector includes "NPNA". If \code{run.NPNA_avg} is TRUE,
 #' the character vector includes "NPNA_avg". If \code{run.NPNA_wrong} is TRUE,
-#' the character vector includes "NPNA_wrong".
+#' the character vector includes "NPNA_wrong". If \code{run.OLS} is TRUE,
+#' the character vector includes "OLSIPW","OLSAIPW","OLSIMP". If \code{run.WLS} is TRUE,
+#' the character vector includes "WLSIPW","WLSAIPW","WLSIMP". If \code{run.EFF} is TRUE,
+#' the character vector includes "EFFIPW","EFFAIPW","EFFIMP".
 #'
 #' @export
 get_method_label <- function(run.NPMLEs,
                              run.NPNA,
                              run.NPNA_avg,
-                             run.NPNA_wrong){
-
-  ## we do not run run.OLS, run.WLS, run.EFF ever.
-  run.OLS <- FALSE
-  run.WLS <- FALSE
-  run.EFF <- FALSE
+                             run.NPNA_wrong,
+                             run.OLS,
+                             run.WLS,
+                             run.EFF){
 
   ## Names for methods run
   est.names <- NULL
   mylabel <- c("IPW","AIPW","IMP")
 
   if(run.NPMLEs==TRUE){
-    est.names <- c(est.names,paste("NPMLE",1,sep=""))
+    est.names <- c(est.names,paste("NPMLE",1:2,sep=""))
   }
 
   if(run.OLS==TRUE){

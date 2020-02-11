@@ -105,5 +105,4 @@ estimators.out <- stride.estimator(n,m,p,qvs,q,
 				true.group.identifier,
 				run.prediction.accuracy,
 				do_cross_validation_AUC_BS)
-#> Error in common_error_messages(n, m, p, qvs, q, x, delta, ww, zz, run.NPMLEs, : User must provide true.groups.
 ```
