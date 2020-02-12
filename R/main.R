@@ -1194,7 +1194,7 @@ sum_array_na <- function(m1,m2){
 #'
 #' }
 #'
-#' @importFrom abind drop
+#' @importFrom abind adrop
 #'
 #' @export
 estimator.main <- function(data,
@@ -1574,13 +1574,13 @@ estimator.main <- function(data,
               if(!is.null(z.use) & !is.null(w.use)){
 
                 if(method.label[kk]!="NPNA_avg"){
-                  Ft.store[kk,tt,tt0,,,] <- unflatten.array(abind::drop(Ft.store[kk,tt,tt0,,,,drop=FALSE],
+                  Ft.store[kk,tt,tt0,,,] <- unflatten.array(abind::adrop(Ft.store[kk,tt,tt0,,,,drop=FALSE],
                                                                         drop=c(1,2,3)),
                                                             dim.order=c("zz","ww","Ft"),
                                                             Ft_test_out[,paste("Ft",1:p,sep="")],
                                                             flatten.name="Ft")
 
-                  Sout.store[kk,tt,tt0,,,] <- unflatten.array(abind::drop(Sout.store[kk,tt,tt0,,,,drop=FALSE],
+                  Sout.store[kk,tt,tt0,,,] <- unflatten.array(abind::adrop(Sout.store[kk,tt,tt0,,,,drop=FALSE],
                                                                           drop=c(1,2,3)),
                                                               dim.order=c("zz","ww","Ft"),
                                                               Sout_test_out[,paste("St",1:m,sep="")],
