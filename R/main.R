@@ -1058,6 +1058,7 @@ make.data.set <- function(
     true.group.identifier <- rep(0,length(delta))
   }
 
+  ## We modify the dataset so that we can allow the possibility of the user NOT having z,w covariates.
   #data <- data.frame(x=x,delta=delta,t(q),ww,zz,uset,true.group.identifier)
   #colnames(data) <- c("x","delta",paste("q",1:p,sep=""),"w","z","uset","group")
 
@@ -1192,6 +1193,8 @@ sum_array_na <- function(m1,m2){
 #'    Otherwise, there is an error in the computation of the NPNA estimator.}
 #'
 #' }
+#'
+#' @importFrom abind drop
 #'
 #' @export
 estimator.main <- function(data,
