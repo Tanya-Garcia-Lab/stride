@@ -1538,7 +1538,12 @@ estimator.main <- function(data,
               Ft.predict.tmp.use <- Ft.predict.tmp[index_test_use]
 
               ## feed in original data
-              data.land.predict <- data_test_subset[,c("x","delta","z","w","uset")]
+              #data.land.predict <- data_test_subset[,c("x","delta","z","w","uset")]
+
+              ## we only need to feed get.predictions "x" and "delta"
+              data.land.predict <- data_test_subset[,c("x","delta")]
+
+
               Sout.prediction <- get.predictions(data.land.predict,
                                                  Ft=1-Sout.predict.tmp.use,
                                                  t0=tval0[tt0],tau=tval[tt]-tval0[tt0])
