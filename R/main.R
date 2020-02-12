@@ -1835,6 +1835,18 @@ match.names <- function(qvs.boot,qvs){
 #'
 #' }
 #'
+#' @references
+#' Garcia, T.P., Marder, K. and Wang, Y. (2017). Statistical modeling of Huntington disease onset.
+#' In Handbook of Clinical Neurology, vol 144, 3rd Series, editors Andrew Feigin and Karen E. Anderson.
+#'
+#' Qing, J., Garcia, T.P., Ma, Y., Tang, M.X., Marder, K., and Wang, Y. (2014).
+#' Combining isotonic regression and EM algorithm to predict genetic risk under monotonicity constraint.
+#' Annals of Applied Statistics, 8(2), 1182-1208.
+#'
+#' Wang, Y., Garcia, T.P., and Ma. Y. (2012).  Nonparametric estimation for censored mixture data with
+#' application to the Cooperative Huntington's Observational Research Trial. Journal of the American Statistical Association,
+#' 107, 1324-1338.
+#'
 #' @export
 #' @useDynLib stride
 stride.nocovariates <- function(n,q,x,delta,
@@ -1912,9 +1924,10 @@ stride.nocovariates <- function(n,q,x,delta,
     out <- NULL
 
     Fest <- array(0,dim=c(p,1),dimnames=list(paste0("p",1:p),"EMPAVA"))
+    out.empava <- stride.empava(n,q,x,delta,timeval,p,tol.level=0.00001, count.max = 100)
 
     ## add estimation of EM-PAVA
-    out$Fest <- Fest
+    out$Fest[,"EMPAVA"] <- out.empava$Fest
 
   }
 
@@ -1926,6 +1939,221 @@ stride.nocovariates <- function(n,q,x,delta,
 ####################################################
 ## functions to run STRIDE EM-PAVA estimators     ##
 ####################################################
+
+#' STRIDE Expectation Maximization with Pool Adjacent Violators Algorithm
+#'
+#' Wrapper function to run STRIDE estimators that computes the distribution function for the mixture data
+#' based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
+#' from isotone regression to yield a non-negative and monotone estimator. This estimator ignores covariates.
+#'
+#' @param n sample size, must be at least 1.
+#' @param q a numeric matrix of size \code{p} by \code{n} containing the
+#' mixture proportions for each person in the sample.
+#' @param x a numeric vector of length \code{n} containing the observed event times
+#' for each person in the sample.
+#' @param delta a numeric vector of length \code{n} that denotes
+#' censoring (1 denotes event is observed, 0 denotes event is censored).
+#' @param timeval numeric value at which the distribution function is evaluated.
+#' @param p number of populations, must be at least 2.
+#' @param tol.level a numeric that denotes the tolerance level of the average
+#'  L1-difference of estimates of the distribution function between EM iterations. Default is 0.00001.
+#' @param count.max a numeric that denotes the number of EM iterates to obtain. Default is 100.
+#'
+#' @return a list containing
+#' \itemize{
+#'    \item{Fest: }{numeric array of dimension \code{p} by \code{length(timeval)}
+#'     containing EM-PAVA estimates of the distribution function evaluated at \code{timeval}.
+#'    }
+#'    \item{Fest.all: }{numeric array of dimension \code{p} by \code{length(timeval)+length(x)}
+#'    containing EM-PAVA estimmates of the distribution function evaluated at all \code{timeval} and all \code{x}
+#'    values.
+#'    }
+#'
+#' }
+#'
+#' @references
+#' Garcia, T.P., Marder, K. and Wang, Y. (2017). Statistical modeling of Huntington disease onset.
+#' In Handbook of Clinical Neurology, vol 144, 3rd Series, editors Andrew Feigin and Karen E. Anderson.
+#'
+#' Qing, J., Garcia, T.P., Ma, Y., Tang, M.X., Marder, K., and Wang, Y. (2014).
+#' Combining isotonic regression and EM algorithm to predict genetic risk under monotonicity constraint.
+#' Annals of Applied Statistics, 8(2), 1182-1208.
+#'
+#'
+#'@importFrom stats pnorm
+#'@importFrom zoo na.approx na.locf
+#'@importFrom Iso pava
+#' @export
+stride.empava <- function(n,q,x,delta,timeval,p,tol.level=0.00001, count.max = 100){
+
+  ## timeval.new contains the points timeval and x together
+  timeval.new <- c(timeval,x)
+  timeval.new <- sort(timeval.new)  ## sorting all time points
+  timeval.indices <- match(timeval,timeval.new)  ## indices of timeval points
+  events.indices <- match(x,timeval.new)  ## indices of event times x
+
+  ## number of time points for evaluation
+  numt.new <- length(timeval.new)
+
+  ## Fest: function for storing results
+  ## Fest0 : initial estimate of Fest, and used in loop
+  Fest <- matrix(0,nrow=p,ncol=numt.new)
+  Fest0 <- Fest
+
+
+  ## initial estimate Fest0
+  for(l in 1:p){
+    Fest0[l,] <- stats::pnorm(timeval.new,mean=mean(timeval.new))
+  }
+
+  ## We set Fest to its initial estimate, Fest0
+  Fest <- Fest0
+
+  ## setting tolerance count for loop
+  tol <- 1
+  count <- 0
+
+  ## all.deaths?
+  ## if all.deaths==TRUE, then we have the complete data case;
+  ## otherwise, we have censoring.
+  all.deaths <- (sum(delta)==n)
+
+  ## Loop for estimating Ft
+  while(tol>tol.level & count<count.max){
+    count <- count+1
+
+    ## u,v are P(D_i=1|X_i<=t_j) and P(D_i=1|X_i>t_j)
+    u <- matrix(0,nrow=n,ncol=numt.new)
+    v <- u
+
+    for(i in 1:n){
+      ## Compute u_ij. for t_j very small, u_ij could be 0/0
+      ## In this case we, set u_ij to be the next largest value.
+
+      u.numerator <- q[1,i]*Fest0[1,]
+      u.denominator <- q[1,i]*Fest0[1,]+q[2,i]*Fest0[2,]
+
+      u[i,] <-  u.numerator/u.denominator
+      u[i,] <- zoo::na.approx(u[i,],na.rm=FALSE,rule=2)
+
+      ##u.index00 <- intersect(which(abs(u.numerator)<1e-10),
+      ##                       which(abs(u.denominator)<1e-10))
+
+      ##if(length(u.index00)>0){
+      ##  u[i,u.index00] <- u[i,(max(u.index00)+1)]
+      ##}
+
+      ## Compute v_ij. for t_j very small, v_ij could be 0/0
+      ## In this case we, set v_ij to be the last value before we got 0/0
+
+      v.numerator <- q[1,i]*(1-Fest0[1,])
+      v.denominator <- (q[1,i]*(1-Fest0[1,])+
+                          q[2,i]*(1-Fest0[2,]))
+
+      v[i,] <- v.numerator / v.denominator
+
+      ## if all temp values are NaN, replace all of them with 0
+      ##if(sum(is.na(v[i,]))==length(v[i,])){
+      ##  v[i,] <- rep(0,length(v[i,]))
+      ##}
+
+      ## if only one value is non-zero, and the rest are NaN
+      ##if(sum(is.na(v[i,]))==(length(v[i,])-1)){
+      ##  v[i,] <- na.locf(v[i,],na.rm=FALSE)
+      ##}
+
+      v[i,] <- zoo::na.approx(v[i,],na.rm=FALSE,rule=2)
+
+      ##v.index00 <- intersect(which(abs(v.numerator)<1e-10),
+      ##                     which(abs(v.denominator)<1e-10))
+
+      ##if(length(v.index00)>0){
+      ##  v[i,v.index00] <- v[i,(min(v.index00)-1)]
+      ##}
+    }
+
+    ## Fest is the unrestricted estimate of Ft
+    ## s are the weights
+    s <- matrix(0,nrow=p,ncol=numt.new)
+
+    if(all.deaths==FALSE){
+      ## censored case
+      w.tmp <- matrix(0,nrow=n,ncol=numt.new)
+      for(j in 1:numt.new){
+        ##print(j)
+        indicator <- rep(0,n)
+        indicator[x>timeval.new[j]] <- 1
+
+        ## denominator
+        bottom <- q[1,]*(1-Fest0[1,events.indices])+q[2,]*(1-Fest0[2,events.indices])
+
+        ## numerator
+        top <- q[1,]*(1-Fest0[1,j])+q[2,]*(1-Fest0[2,j])
+        temp <- (1-delta)*top/bottom
+
+        ######################
+        ## make adjustments ##
+        ######################
+
+        ## replace Inf with 0's
+        temp[temp==Inf] <- 0
+
+        ## if all temp values are NaN, replace all of them with 0
+        if(sum(is.na(temp))==length(temp)){
+          temp <- rep(0,length(temp))
+        }
+
+        ## if only one value is non-zero, and the rest are NaN
+        if(sum(is.na(temp))==(length(temp)-1)){
+          temp <- zoo::na.locf(temp,na.rm=FALSE)
+        }
+        temp <- zoo::na.approx(temp,na.rm=FALSE,rule=2)
+
+        indicator[x<=timeval.new[j]] <- temp[x<=timeval.new[j]]
+
+        ## we compute 1-w_ij
+        w.tmp[,j] <- 1-indicator
+      }
+
+      for(j in 1:numt.new){
+        s[1,j] <- sum(u[,j]*w.tmp[,j])+sum(v[,j]*(1-w.tmp[,j]))
+        s[2,j] <- sum((1-u[,j])*w.tmp[,j])+sum((1-v[,j])*(1-w.tmp[,j]))
+        Fest[1,j] <- sum(u[,j]*w.tmp[,j])/s[1,j]
+        Fest[2,j] <- sum((1-u[,j])*w.tmp[,j])/s[2,j]
+      }
+
+    } else {
+      ## non-censored case
+      for(j in 1:numt.new){
+        tem <- rep(0,n)
+        tem[x<=timeval.new[j]] <- 1
+        s[1,j] <- sum(u[,j]*tem)+sum(v[,j]*(1-tem))
+        s[2,j] <- sum((1-u[,j])*tem)+sum((1-v[,j])*(1-tem))
+        Fest[1,j] <- sum(u[,j]*tem)/s[1,j]
+        Fest[2,j] <- sum((1-u[,j])*tem)/s[2,j]
+      }
+
+    }
+
+
+    for(l in 1:p){
+      Fest[l,] <- Iso::pava(Fest[l,],s[l,])
+    }
+
+    tol <- data.frame(apply(Fest-Fest0,1,abs))
+    tol <- apply(tol,2,mean)
+    tol <- sum(tol)
+
+    ## reset initial estimate
+    Fest0 <- Fest
+  }
+
+  ## We output Fest only evaluated at time points of interest (i.e., timeval)
+  Fest.all <- Fest
+  Fest <- Fest[,timeval.indices]
+
+  return(list(Fest=Fest,Fest.all=Fest.all))
+}
 
 
 
