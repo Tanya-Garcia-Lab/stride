@@ -4,7 +4,7 @@ censoring.rate <- 40
 p <- 2
 n <- 2000
 m <- 4
-tval <- 20 ##seq(0,80,by=5)
+tval <- seq(20,40,60,80)
 tval0 <- c(0)
 z.use <- c(0,1)
 w.use <- seq(35,55,by=1)
@@ -12,8 +12,8 @@ run.prediction.accuracy <- FALSE
 update.qs <- FALSE
 simu.setting <- "HD-No-Covariates"
 covariate.dependent <- TRUE
-run.NPMLEs <- TRUE
-run.NPNA <- FALSE
+run.NPMLEs <- FALSE
+run.NPNA <- TRUE
 run.OLS <- FALSE
 run.WLS <- FALSE
 run.EFF <- FALSE
