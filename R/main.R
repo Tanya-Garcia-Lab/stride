@@ -1744,6 +1744,10 @@ get_method_label <- function(run.NPMLEs,
     est.names <- c(est.names,"NPNA_wrong")
   }
 
+  if(run.EMPAVA==TRUE){
+    est.names <- c(est.names,"EMPAVA")
+  }
+
   return(est.names)
 }
 
