@@ -1923,9 +1923,10 @@ stride.nocovariates <- function(n,q,x,delta,
 
 
 
-#############################################
-## functions to run EM-PAVA estimators     ##
-#############################################
+####################################################
+## functions to run STRIDE EM-PAVA estimators     ##
+####################################################
+
 
 
 #' Alpha quantile
