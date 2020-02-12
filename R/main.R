@@ -119,9 +119,9 @@ stride.estimator.wrapper <- function(
 #' @param delta a numeric vector of length \code{n} that denotes
 #' censoring (1 denotes event is observed, 0 denotes event is censored).
 #' @param ww a numeric vector of length \code{n} containing the values of the continuous
-#' covariate for each person in the sample.
+#' covariate for each person in the sample. Can be NULL.
 #' @param zz a numeric vector of length \code{n} containing the values of the discrete
-#' covariate for each person in the sample.
+#' covariate for each person in the sample. Can be NULL.
 #' @param run.NPMLEs a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
 #' estimators. The type I nonparametric maximum likelihood estimator is referred
@@ -154,9 +154,9 @@ stride.estimator.wrapper <- function(
 #' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
 #' and smaller than the maximum of \code{tval}.
 #' @param z.use numeric vector at which to evaluate the discrete covariate \eqn{Z} at in the estimated distribution function.
-#' The values of \code{z.use} must be in the range of the observed \code{zz}.
+#' The values of \code{z.use} must be in the range of the observed \code{zz}. Can be NULL.
 #' @param w.use numeric vector at which to evaluate the continuous covariate \eqn{W} at in the estimated distribution function.
-#' The values of \code{w.use} must be in the range of the observed \code{ww}.
+#' The values of \code{w.use} must be in the range of the observed \code{ww}. Can be NULL.
 #' @param update.qs logical indicator. If TRUE, the mixture proportions \code{q} will be updated. This is currently not implemented.
 #' @param know.true.groups logical indicator. If TRUE, then we know the population identifier for each person in the sample.
 #' This option is only used for simulation studies. Default is FALSE.
@@ -322,9 +322,9 @@ common_error_messages <- function(n,m,p,qvs,q,
 #' @param delta a numeric vector of length \code{n} that denotes
 #' censoring (1 denotes event is observed, 0 denotes event is censored).
 #' @param ww a numeric vector of length \code{n} containing the values of the continuous
-#' covariate for each person in the sample.
+#' covariate for each person in the sample. Can be NULL.
 #' @param zz a numeric vector of length \code{n} containing the values of the discrete
-#' covariate for each person in the sample.
+#' covariate for each person in the sample. Can be NULL.
 #' @param run.NPMLEs a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
 #' estimators. The type I nonparametric maximum likelihood estimator is referred
@@ -357,9 +357,9 @@ common_error_messages <- function(n,m,p,qvs,q,
 #' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
 #' and smaller than the maximum of \code{tval}.
 #' @param z.use numeric vector at which to evaluate the discrete covariate \eqn{Z} at in the estimated distribution function.
-#' The values of \code{z.use} must be in the range of the observed \code{zz}.
+#' The values of \code{z.use} must be in the range of the observed \code{zz}.  Can be NULL.
 #' @param w.use numeric vector at which to evaluate the continuous covariate \eqn{W} at in the estimated distribution function.
-#' The values of \code{w.use} must be in the range of the observed \code{ww}.
+#' The values of \code{w.use} must be in the range of the observed \code{ww}.  Can be NULL.
 #' @param update.qs logical indicator. If TRUE, the mixture proportions \code{q} will be updated. This is currently not implemented.
 #' @param know.true.groups logical indicator. If TRUE, then we know the population identifier for each person in the sample.
 #' This option is only used for simulation studies to check prediction accuracy. Default is FALSE.
@@ -404,18 +404,20 @@ common_error_messages <- function(n,m,p,qvs,q,
 #'
 #'    \item{Ft.estimate: }{a numeric array containing the estimated distribution functions for all methods for all
 #'    \code{p} populations. The distribution function is evaluated at each \code{tval},
-#'    \code{tval0}, \code{z.use}, \code{w.use}, and for all \code{p} populations.
+#'    \code{tval0}, \code{z.use} (if non-NULL), \code{w.use} (if non-NULL), and for all \code{p} populations.
 #'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
-#'    \code{length(z.use)} by \code{length(w.use)} by \code{p}.  The distribution function is only valid for \eqn{t\geq t_0}, so
+#'    \code{length(z.use)} by \code{length(w.use)} by \code{p}. If \code{z.use} and \code{w.use} are NULL,
+#'    the dimension of the array is  \# of methods by \code{length(tval)} by \code{lenth(tval0)} by \code{p}. The distribution function is only valid for \eqn{t\geq t_0}, so
 #'    \code{Ft.estimate} shows NA for any combination for which \eqn{t<t_0}.
 #'    }
 #'
 #'    \item {St.estimate: }{a numeric array containing the estimated distribution functions for all methods
 #'    for all \code{m} mixture proportion subgroups. The distribution function is evaluated
-#'    at each \code{tval}, \code{tval0}, \code{z.use}, \code{w.use}, and for all \code{m} mixture
+#'    at each \code{tval}, \code{tval0}, \code{z.use} (if non-NULL), \code{w.use} (if non-NULL), and for all \code{m} mixture
 #'    proportion subgroups.
 #'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
-#'    \code{length(z.use)} by \code{length(w.use)} by \code{m}.  The distribution function is only valid for \eqn{t\geq t_0}, so
+#'    \code{length(z.use)} by \code{length(w.use)} by \code{m}. If \code{z.use} and \code{w.use} are NULL,
+#'    the dimension of the array   is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by \code{m}.  The distribution function is only valid for \eqn{t\geq t_0}, so
 #'    \code{St.estimate} shows NA for any combination for which \eqn{t<t_0}.
 #'    }
 #'
@@ -554,9 +556,9 @@ stride.estimator <- function(n,m,p,qvs,q,
 #' @param delta a numeric vector of length \code{n} that denotes
 #' censoring (1 denotes event is observed, 0 denotes event is censored).
 #' @param ww a numeric vector of length \code{n} containing the values of the continuous
-#' covariate for each person in the sample.
+#' covariate for each person in the sample.  Can be NULL.
 #' @param zz a numeric vector of length \code{n} containing the values of the discrete
-#' covariate for each person in the sample.
+#' covariate for each person in the sample.  Can be NULL.
 #' @param run.NPMLEs a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
 #' estimators. The type I nonparametric maximum likelihood estimator is referred
@@ -589,9 +591,9 @@ stride.estimator <- function(n,m,p,qvs,q,
 #' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
 #' and smaller than the maximum of \code{tval}.
 #' @param z.use numeric vector at which to evaluate the discrete covariate \eqn{Z} at in the estimated distribution function.
-#' The values of \code{z.use} must be in the range of the observed \code{zz}.
+#' The values of \code{z.use} must be in the range of the observed \code{zz}.  Can be NULL.
 #' @param w.use numeric vector at which to evaluate the continuous covariate \eqn{W} at in the estimated distribution function.
-#' The values of \code{w.use} must be in the range of the observed \code{ww}.
+#' The values of \code{w.use} must be in the range of the observed \code{ww}.  Can be NULL.
 #' @param update.qs logical indicator. If TRUE, the mixture proportions \code{q} will be updated. This is currently not implemented.
 #' @param know.true.groups logical indicator. If TRUE, then we know the population identifier for each person in the sample.
 #' This option is only used for simulation studies. Default is FALSE.
@@ -639,14 +641,19 @@ stride.estimator <- function(n,m,p,qvs,q,
 #' application to the Cooperative Huntington's Observational Research Trial. Journal of the American Statistical Association,
 #' 107, 1324-1338.
 #'
+#'
+#'
 #' @return \code{stride.bootstrap.variance} returns a list containing
 #' \itemize{
 #'    \item{Ft.estimate.boot: }{a numeric array containing the estimated bootstrap variances,
 #'    the 2.5% bootstrap quantile, and the 97.5% bootstrap quantile for all methods
 #'    of the distribution function at all \code{p} populations. The results are shown at each \code{tval},
-#'    \code{tval0}, \code{z.use}, \code{w.use}, and for all \code{p} populations.
+#'    \code{tval0}, \code{z.use} (if non-NULL),  \code{w.use} (if non-NULL), and for all \code{p} populations.
 #'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
-#'    \code{length(z.use)} by \code{length(w.use)} by \code{p} by 3. The last dimension
+#'    \code{length(z.use)} by \code{length(w.use)} by \code{p} by 3. If \code{z.use} and \code{w.use} are NULL,
+#'    the dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)}
+#'    by \code{p} by 3.
+#'    The last dimension
 #'    corresponds to the bootstrap variance estimate, 2.5% bootstrap quantile,
 #'    and the 97.5% bootstrap quantile.  The results are only valid for \eqn{t\geq t_0}, so
 #'    \code{Ft.estimate} shows NA for any combination for which \eqn{t<t_0}.
@@ -655,10 +662,12 @@ stride.estimator <- function(n,m,p,qvs,q,
 #'    \item {St.estimate.boot: }{a numeric array containing the estimated bootstrap variances,
 #'    the 2.5% bootstrap quantile, and the 97.5% bootstrap quantile for all methods
 #'    of the distribution function at all \code{m} \code{m} mixture proportion subgroups. The
-#'    results are shown at each \code{tval}, \code{tval0}, \code{z.use}, \code{w.use}, and for all \code{m} mixture
+#'    results are shown at each \code{tval}, \code{tval0}, \code{z.use} (if non-NULL), \code{w.use} (if non-NULL), and for all \code{m} mixture
 #'    proportion subgroups.
 #'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
 #'    \code{length(z.use)} by \code{length(w.use)} by \code{m} by 3.
+#'    If \code{z.use} and \code{w.use} are NULL, then the dimension of the array is
+#'    \# of methods by \code{length(tval)} by \code{lenth(tval0)} by \code{m} by 3
 #'    The last dimension
 #'    corresponds to the bootstrap variance estimate, 2.5% bootstrap quantile,
 #'    and the 97.5% bootstrap quantile.  The results are only valid for \eqn{t\geq t_0}, so
@@ -1031,16 +1040,17 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
 #' @param delta a numeric vector of length \code{n} that denotes
 #' censoring (1 denotes event is observed, 0 denotes event is censored).
 #' @param ww a numeric vector of length \code{n} containing the values of the continuous
-#' covariate for each person in the sample.
+#' covariate for each person in the sample.  Can be NULL.
 #' @param zz a numeric vector of length \code{n} containing the values of the discrete
-#' covariate for each person in the sample.
+#' covariate for each person in the sample.  Can be NULL.
 #' @param know.true.groups logical indicator. If TRUE, then we know the population identifier for each person in the sample.
 #' This option is only used for simulation studies. Default is FALSE.
 #' @param true.group.identifier numeric vector of length \code{n} denoting the population identifier for each person in the sample.
 #' Default is NULL.
 #'
 #' @return a matrix of the concatenated data. The columns are "x", "delta", "q1" to "qp" (correspond to the mixture proportions),
-#' "w" (for \code{ww}), "z" (for \code{zz}), "uset" (for "u-set" meaning the uth mixture proportion group), and
+#' "w" (for \code{ww} if non-NULL), "z" (for \code{zz} if non-NULL),
+#' "uset" (for "u-set" meaning the uth mixture proportion group), and
 #' "group" (for the true population group as defined by \code{true.group.identifier}). If \code{know.true.groups} is
 #' FALSE, then the column "group" is a vector of 0's.
 
