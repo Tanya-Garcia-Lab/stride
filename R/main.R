@@ -1440,8 +1440,8 @@ estimator.main <- function(data,
                 mySout <- rep(0,m.tmp)
               }
               ## Repeat the estimates for Ft and St since these are the same for all covariate values.
-              print(method.label[kk])
-              print(myFest)
+              ##print(method.label[kk])
+              ##print(myFest)
               Ft_test_out[,paste("Ft",1:p,sep="")] <- rep.row(myFest,nrow(Ft_test_out))
 
 
