@@ -1386,7 +1386,7 @@ estimator.main <- function(data,
           set.run <- set.kin.run(method.label[kk])
 
           ## run kin-cohort estimator
-          kin.out0 <- kincohort.estimators(n.tmp,
+          kin.out0 <- stride.nocovariates(n.tmp,
                                            q=q.tmp,
                                            x=x.tmp,
                                            delta=delta.tmp,
@@ -1415,7 +1415,7 @@ estimator.main <- function(data,
 
             if(!grepl("NPNA*",method.label[kk])){
               ## run kin-cohort estimator
-              kin.out <- kincohort.estimators(n.tmp,
+              kin.out <- stride.nocovariates(n.tmp,
                                               q=q.tmp,
                                               x=x.tmp,
                                               delta=delta.tmp,
@@ -1752,12 +1752,13 @@ match.names <- function(qvs.boot,qvs){
 
 
 #############################################
-## functions to run kincohort estimators   ##
+## functions to run STRIDE estimators      ##
+## without covariates                      ##
 #############################################
-#' Nonparametric kincohort estimators
+#' STRIDE estimators without covariates
 #'
-#' Wrapper function to run kincohort estimators that
-#' ignore covariates and landmarking.
+#' Wrapper function to run STRIDE estimators that
+#' ignore covariates.
 #'
 #' @param n sample size, must be at least 1.
 #' @param q a numeric matrix of size \code{p} by \code{n} containing the
@@ -1802,7 +1803,7 @@ match.names <- function(qvs.boot,qvs){
 #'
 #' @export
 #' @useDynLib stride
-kincohort.estimators <- function(n,q,x,delta,
+stride.nocovariates <- function(n,q,x,delta,
                                  t,qvs,p,m,r,
                                  boot,bootvar,
                                  useOLS,useWLS,useEFF,
@@ -2176,7 +2177,7 @@ kin.updateq <- function(data,n,p,m,r.orig,qvs.orig,q.orig,t0,method.label){
     ####################
     ## get estimators ##
     ####################
-    kin.out <- kincohort.estimators(n,
+    kin.out <- stride.nocovariates(n,
                                     q=t(q.orig.tmp),
                                     x=data$x,
                                     delta=data$delta,
