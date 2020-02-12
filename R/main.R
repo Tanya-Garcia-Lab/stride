@@ -1568,33 +1568,35 @@ estimator.main <- function(data,
               ######################################
               ## output results at specific (z,w) ##
               ######################################
-              if(method.label[kk]!="NPNA_avg"){
-                Ft.store[kk,tt,tt0,,,] <- unflatten.array(abind::drop(Ft.store[kk,tt,tt0,,,,drop=FALSE],
-                                                                    drop=c(1,2,3)),
-                                                          dim.order=c("zz","ww","Ft"),
-                                                          Ft_test_out[,paste("Ft",1:p,sep="")],
-                                                          flatten.name="Ft")
+              if(!is.null(z.use) & !is.null(w.use)){
 
-                Sout.store[kk,tt,tt0,,,] <- unflatten.array(abind::drop(Sout.store[kk,tt,tt0,,,,drop=FALSE],
+                if(method.label[kk]!="NPNA_avg"){
+                  Ft.store[kk,tt,tt0,,,] <- unflatten.array(abind::drop(Ft.store[kk,tt,tt0,,,,drop=FALSE],
                                                                         drop=c(1,2,3)),
                                                             dim.order=c("zz","ww","Ft"),
-                                                            Sout_test_out[,paste("St",1:m,sep="")],
+                                                            Ft_test_out[,paste("Ft",1:p,sep="")],
                                                             flatten.name="Ft")
-              } else{
-                ## take average over all (z,w) combinations
-                Ft.tmp.avg <- apply(Ft_test_out[,paste("Ft",1:p,sep="")],2,mean)
-                Sout.tmp.avg <- apply(Sout_test_out[,paste("St",1:m,sep="")],2,mean)
 
-                if(!is.null(z.use) & !is.null(w.use)){
+                  Sout.store[kk,tt,tt0,,,] <- unflatten.array(abind::drop(Sout.store[kk,tt,tt0,,,,drop=FALSE],
+                                                                          drop=c(1,2,3)),
+                                                              dim.order=c("zz","ww","Ft"),
+                                                              Sout_test_out[,paste("St",1:m,sep="")],
+                                                              flatten.name="Ft")
+                } else{
+                  ## take average over all (z,w) combinations
+                  Ft.tmp.avg <- apply(Ft_test_out[,paste("Ft",1:p,sep="")],2,mean)
+                  Sout.tmp.avg <- apply(Sout_test_out[,paste("St",1:m,sep="")],2,mean)
+
                   ## repeat the estimates for all (z,w) combinations
                   Ft.store[kk,tt,tt0,,,] <- repeat.zw(Ft.tmp.avg,z.use,w.use,p)
                   Sout.store[kk,tt,tt0,,,] <- repeat.zw(Sout.tmp.avg,z.use,w.use,m)
-                } else if(is.null(z.use) & is.null(w.use)){
-                  ## report the estimates
-                  Ft.store[kk,tt,tt0,] <- Ft.tmp.avg
-                  Sout.store[kk,tt,tt0,] <- Sout.tmp.avg
                 }
+
+              } else if(is.null(z.use) & is.null(w.use)){
+                Ft.store[kk,tt,tt0,] <- Ft_test_out[,paste("Ft",1:p,sep="")]
+                Sout.store[kk,tt,tt0,] <- Sout_test_out[,paste("St",1:m,sep="")]
               }
+
             }
           }
         }
