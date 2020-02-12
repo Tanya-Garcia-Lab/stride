@@ -222,7 +222,9 @@ common_error_messages <- function(n,m,p,qvs,q,
   stop_length_message(delta,n)
 
   ## check if ww is of length n
-  stop_length_message(ww,n)
+  if(!is.null(ww)){
+    stop_length_message(ww,n)
+  }
 
   ## check if zz is of length n
   stop_length_message(zz,n)
