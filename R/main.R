@@ -1948,23 +1948,28 @@ set.kin.run <- function(method.label.unit){
 get.tmp.storage <- function(run.prediction.accuracy,method,
                             z.use,w.use,data,p,m){
 
-  if(run.prediction.accuracy==TRUE | method=="NPNA_avg" ){
-    ## storage for calculation
-    data.zw <- data[,c("z","w")]
-  } else{
-    ## storage for calculation
-    data.zw <- get.zw.combinations(z.use,w.use)
+  if(!is.null(z.use) & !is.null(w.use)){
+    if(run.prediction.accuracy==TRUE | method=="NPNA_avg" ){
+      ## storage for calculation
+      data.zw <- data[,c("z","w")]
+    } else{
+      ## storage for calculation
+      data.zw <- get.zw.combinations(z.use,w.use)
+    }
+
+    ## Ft and Sout have n rows
+    Ft.tmp.out <- tmp.storage(data.tmp=data.zw,dim.col=p,dim.names="Ft")
+
+
+    Sout.tmp.out <- tmp.storage(data.tmp=data.zw,dim.col=m,dim.names="St")
+
+    ## remove duplicates
+    data.zw <- data.zw[!duplicated(data.zw),]
+  } else if(is.null(z.use) & is.null(w.use)){
+    data.zw <- NULL
+    Ft.tmp.out <- array(NA,dim=c(1,p),dimnames=list(1,paste0("Ft",1:p)))
+    Sout.tmp.out <- array(NA,dim=c(1,m),dimnames=list(1,paste0("St",1:m)))
   }
-
-  ## Ft and Sout have n rows
-  Ft.tmp.out <- tmp.storage(data.tmp=data.zw,dim.col=p,dim.names="Ft")
-
-
-  Sout.tmp.out <- tmp.storage(data.tmp=data.zw,dim.col=m,dim.names="St")
-
-  ## remove duplicates
-  data.zw <- data.zw[!duplicated(data.zw),]
-
   list(data.zw=data.zw,Ft.tmp.out=Ft.tmp.out,Sout.tmp.out=Sout.tmp.out)
 }
 
