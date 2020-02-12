@@ -1058,12 +1058,30 @@ make.data.set <- function(
     true.group.identifier <- rep(0,length(delta))
   }
 
-  data <- data.frame(x=x,delta=delta,t(q),ww,zz,uset,true.group.identifier)
-  colnames(data) <- c("x","delta",paste("q",1:p,sep=""),"w","z","uset","group")
+  #data <- data.frame(x=x,delta=delta,t(q),ww,zz,uset,true.group.identifier)
+  #colnames(data) <- c("x","delta",paste("q",1:p,sep=""),"w","z","uset","group")
+
+  dataset <-data.frame(x=x,delta=delta,t(q),uset,true.group.identifier)
+  colnames_dataset <- c("x","delta",paste("q",1:p,sep=""),"uset","group")
+
+  ## add z covariates
+  if(!is.null(zz)){
+    dataset <- data.frame(dataset,zz)
+    colnames_dataset <- c(colnames_dataset,"z")
+  }
+
+  ## add w covariates
+  if(!is.null(ww)){
+    dataset <- data.frame(dataset,ww)
+    colnames_dataset <- c(colnames_dataset,"w")
+  }
+
+  ## add column names
+  colnames(dataset) <- colnames_dataset
 
   ## sort in increasing order by x
-  data <- data[order(data$x),]
-  return(data)
+  dataset <- dataset[order(dataset$x),]
+  return(dataset)
 }
 
 ## function to sum NAs from array
