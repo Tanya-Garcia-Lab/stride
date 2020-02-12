@@ -2410,29 +2410,41 @@ get.null.theta <- function(theta.names=c("estimator","prediction"),
 
   null.theta <- get.empty.list(theta.names)
 
-  null.theta[["estimator"]] <- array(NA,dim=c(length(first.label.name),
-                                              length(tval),
-                                              length(tval0),
-                                              length(z.use),
-                                              length(w.use),p),
-                                     dimnames=list(
-                                       method=first.label.name,
-                                       time=paste("tt",tval,sep=""),
-                                       time0=paste("tt0",tval0,sep=""),
-                                       zz=z.use,
-                                       ww=w.use,
-                                       Ft=paste(Ft.name,1:p,sep="")))
+  ## modify length of null.theta depending on inclusion of w.use, z.use
+  if(!is.null(z.use) & !is.null(w.use)){
+    null.theta[["estimator"]] <- array(NA,dim=c(length(first.label.name),
+                                                length(tval),
+                                                length(tval0),
+                                                length(z.use),
+                                                length(w.use),p),
+                                       dimnames=list(
+                                         method=first.label.name,
+                                         time=paste("tt",tval,sep=""),
+                                         time0=paste("tt0",tval0,sep=""),
+                                         zz=z.use,
+                                         ww=w.use,
+                                         Ft=paste(Ft.name,1:p,sep="")))
+  } else if(is.null(z.use) & is.null(w.use)){
+    null.theta[["estimator"]] <- array(NA,dim=c(length(first.label.name),
+                                                length(tval),
+                                                length(tval0),p),
+                                       dimnames=list(
+                                         method=first.label.name,
+                                         time=paste("tt",tval,sep=""),
+                                         time0=paste("tt0",tval0,sep=""),
+                                         Ft=paste(Ft.name,1:p,sep="")))
+
+  }
 
   null.theta[["prediction"]] <- array(NA,dim=c(length(first.label.name),
                                                length(tval),
-                                               length(tval0),2
-  ),
-  dimnames=list(
-    method=first.label.name,
-    time=paste("tt",tval,sep=""),
-    time0=paste("tt0",tval0,sep=""),
-    measure=c("AUC","BS")
-  ))
+                                               length(tval0),2),
+                                  dimnames=list(
+                                    method=first.label.name,
+                                    time=paste("tt",tval,sep=""),
+                                    time0=paste("tt0",tval0,sep=""),
+                                    measure=c("AUC","BS")
+                                  ))
 
   return(null.theta)
 }
