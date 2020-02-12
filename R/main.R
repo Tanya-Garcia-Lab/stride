@@ -243,8 +243,14 @@ common_error_messages <- function(n,m,p,qvs,q,
   }
 
   ## check if z.use in the range of observed zz
-  if(any(!z.use%in% range(zz) ) ){
-    warning("Not all values in z.use are in the range of observed Z.")
+  if(!is.null(z.use)){
+    if(is.null(zz)){
+      stop("To evaluate the method(s) at z.use, you need to provide z-covariate values for each subject.")
+    }
+
+    if(any(!z.use%in% range(zz) ) ){
+      warning("Not all values in z.use are in the range of observed Z.")
+    }
   }
 
   ## check if w.use in the range of observed ww
