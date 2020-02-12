@@ -282,7 +282,19 @@ common_error_messages <- function(n,m,p,qvs,q,
            know.true.groups=TRUE and provide true.group.identifier.")
     }
 
+  }
+
+  ## add warning message about NPNA methods and need for covariates
+  if(run.NPNA==TRUE | run.NPNA_avg==TRUE | run.NPNA_wrong==TRUE){
+    if(is.null(zz) | is.null(ww)){
+      stop("For estimators of NPNA, NPNA_avg, NPNA_wrong, the user must provide covariate values z and w
+           for each subject.")
     }
+
+    if(is.null(z.use) | is.null(w.use)){
+      stop("For estimators of NPNA, NPNA_avg, NPNA_wrong, the user must provide covariate z.use and w.use.")
+    }
+  }
 
   if(!any(c(run.NPMLEs,run.NPNA,run.NPNA_avg,run.NPNA_wrong,
             run.OLS,run.WLS,run.EFF))){
