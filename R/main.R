@@ -19,6 +19,7 @@ stride.estimator.wrapper <- function(
   run.OLS,
   run.WLS,
   run.EFF,
+  run.EMPAVA,
   tval,tval0,
   z.use,w.use,
   update.qs=FALSE,
@@ -39,6 +40,7 @@ stride.estimator.wrapper <- function(
                         run.OLS,
                         run.WLS,
                         run.EFF,
+                        run.EMPAVA,
                         tval,tval0,
                         z.use,w.use,
                         update.qs,
@@ -58,7 +60,9 @@ stride.estimator.wrapper <- function(
                                 run.NPNA_wrong,
                                 run.OLS,
                                 run.WLS,
-                                run.EFF
+                                run.EFF,
+                                run.EMPAVA
+
   )
 
   method.label <- est.names
@@ -149,6 +153,9 @@ stride.estimator.wrapper <- function(
 #' The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
 #' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' @param run.EMPAVA logical indicator. If TRUE, we compute the distribution function for the mixture data
+#' based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
+#' from isotone regression to yield a non-negative and monotone estimator.
 #' @param tval numeric vector of time points at which the distribution function is evaluated, all values must
 #' be non-negative.
 #' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
@@ -191,6 +198,7 @@ common_error_messages <- function(n,m,p,qvs,q,
                                   run.OLS,
                                   run.WLS,
                                   run.EFF,
+                                  run.EMPAVA,
                                   tval,tval0,
                                   z.use,w.use,
                                   update.qs,
@@ -297,7 +305,7 @@ common_error_messages <- function(n,m,p,qvs,q,
   }
 
   if(!any(c(run.NPMLEs,run.NPNA,run.NPNA_avg,run.NPNA_wrong,
-            run.OLS,run.WLS,run.EFF))){
+            run.OLS,run.WLS,run.EFF,run.EMPAVA))){
     stop("No methods are set to run.")
   }
 }
@@ -352,6 +360,9 @@ common_error_messages <- function(n,m,p,qvs,q,
 #' The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
 #' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' @param run.EMPAVA logical indicator. If TRUE, we compute the distribution function for the mixture data
+#' based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
+#' from isotone regression to yield a non-negative and monotone estimator.
 #' @param tval numeric vector of time points at which the distribution function is evaluated, all values must
 #' be non-negative.
 #' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
@@ -460,6 +471,7 @@ stride.estimator <- function(n,m,p,qvs,q,
                               run.OLS,
                               run.WLS,
                               run.EFF,
+                              run.EMPAVA,
                               tval,tval0,
                               z.use,w.use,
                               update.qs,
@@ -481,6 +493,7 @@ stride.estimator <- function(n,m,p,qvs,q,
     run.OLS,
     run.WLS,
     run.EFF,
+    run.EMPAVA,
     tval,tval0,
     z.use,w.use,
     update.qs,
@@ -513,6 +526,7 @@ stride.estimator <- function(n,m,p,qvs,q,
         run.OLS,
         run.WLS,
         run.EFF,
+        run.EMPAVA,
         tval,tval0,
         z.use,w.use,
         update.qs,
@@ -586,6 +600,9 @@ stride.estimator <- function(n,m,p,qvs,q,
 #' The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
 #' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' @param run.EMPAVA logical indicator. If TRUE, we compute the distribution function for the mixture data
+#' based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
+#' from isotone regression to yield a non-negative and monotone estimator.
 #' @param tval numeric vector of time points at which the distribution function is evaluated, all values must
 #' be non-negative.
 #' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
@@ -708,6 +725,7 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
                                        run.OLS,
                                        run.WLS,
                                        run.EFF,
+                                       run.EMPAVA,
                                        tval,tval0,
                                        z.use,w.use,
                                        update.qs,
@@ -733,6 +751,7 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
                         run.OLS,
                         run.WLS,
                         run.EFF,
+                        run.EMPAVA,
                         tval,tval0,
                         z.use,w.use,
                         update.qs,
@@ -749,7 +768,8 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
                                 run.NPNA_wrong,
                                 run.OLS,
                                 run.WLS,
-                                run.EFF)
+                                run.EFF,
+                                run.EMPAVA)
 
 
 
@@ -913,6 +933,7 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
       run.OLS,
       run.WLS,
       run.EFF,
+      run.EMPAVA,
       tval,tval0,
       z.use,w.use,
       update.qs,
@@ -1383,7 +1404,7 @@ estimator.main <- function(data,
         ## NPMLE estimator at t0 ##
         ##########################
         if(!grepl("NPNA*",method.label[kk])){
-          set.run <- set.kin.run(method.label[kk])
+          set.run <- set.stride.nocovariates.run(method.label[kk])
 
           ## run kin-cohort estimator
           kin.out0 <- stride.nocovariates(n.tmp,
@@ -1654,6 +1675,9 @@ estimator.main <- function(data,
 #' The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
 #' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' @param run.EMPAVA logical indicator. If TRUE, we compute the distribution function for the mixture data
+#' based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
+#' from isotone regression to yield a non-negative and monotone estimator.
 #'
 #' @references
 #' Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
@@ -1685,7 +1709,8 @@ get_method_label <- function(run.NPMLEs,
                              run.NPNA_wrong,
                              run.OLS,
                              run.WLS,
-                             run.EFF){
+                             run.EFF,
+                             run.EMPAVA){
 
   ## Names for methods run
   est.names <- NULL
@@ -1958,13 +1983,14 @@ compute.r <- function(n,m,p,qvs,q.use){
 }
 
 
-## how to set run.OLS, run.WLS, run.EFF, run.NPMLEs based on \code{method.label.unit}
+## how to set run.OLS, run.WLS, run.EFF, run.NPMLEs,run.EMPAVA based on \code{method.label.unit}
 #' @importFrom utils glob2rx
-set.kin.run <- function(method.label.unit){
+set.stride.nocovariates.run <- function(method.label.unit){
   run.OLS <- FALSE
   run.WLS <- FALSE
   run.EFF <- FALSE
   run.NPMLEs <- FALSE
+  run.EMPAVA <- FALSE
 
   if(length(grep(utils::glob2rx("OLS*"),method.label.unit))>0){
     run.OLS <- TRUE
@@ -1982,7 +2008,12 @@ set.kin.run <- function(method.label.unit){
     run.NPMLEs <- TRUE
   }
 
-  list(run.OLS=run.OLS,run.WLS=run.WLS,run.EFF=run.EFF,run.NPMLEs=run.NPMLEs)
+  if(length(grep(utils::glob2rx("EMPAVA*"),method.label.unit))>0){
+    run.EMPAVA <- TRUE
+  }
+
+  return(list(run.OLS=run.OLS,run.WLS=run.WLS,run.EFF=run.EFF,
+       run.NPMLEs=run.NPMLEs,run.EMPAVA=run.EMPAVA))
 }
 
 #############################################################################
@@ -2180,7 +2211,7 @@ kin.updateq <- function(data,n,p,m,r.orig,qvs.orig,q.orig,t0,method.label){
 
 
   for(kk in 1:length(method.label)){
-    set.run <- set.kin.run(method.label[kk])
+    set.run <- set.stride.nocovariates.run(method.label[kk])
 
     ################################################
     ## set up q.orig, qvs.orig, r.orig for method ##
