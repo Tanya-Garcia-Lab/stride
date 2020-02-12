@@ -887,8 +887,13 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
     problem <- estimators.out$problem
     if(is.null(problem)){
       ## there is no problem, so get the results.
-      Ft.boot.out[bb,,,,,,] <- estimators.out$Ft.estimate
-      Sout.boot.out[bb,,,,,,] <- estimators.out$St.estimate
+      if(!is.null(z.use) & !is.null(w.use)){
+        Ft.boot.out[bb,,,,,,] <- estimators.out$Ft.estimate
+        Sout.boot.out[bb,,,,,,] <- estimators.out$St.estimate
+      } else if(is.null(z.use) & is.null(w.use)) {
+        Ft.boot.out[bb,,,,] <- estimators.out$Ft.estimate
+        Sout.boot.out[bb,,,,] <- estimators.out$St.estimate
+      }
 
       if(run.prediction.accuracy==TRUE){
         predict.boot.out[bb,method.label,,,] <- estimators.out$Ft.AUC.BS
@@ -937,14 +942,28 @@ stride.bootstrap.variance <- function(nboot,n,m,p,qvs,q,
   }
 
   Ft.variance <- get.my.variance(Ft.boot.out,estimator_Ft)
-  Ft.estimate.boot[,,,,,,"varest"]  <- Ft.variance$varest
-  Ft.estimate.boot[,,,,,,"varlo"]  <- Ft.variance$varlo
-  Ft.estimate.boot[,,,,,,"varhi"]  <- Ft.variance$varhi
-
   Sout.variance <- get.my.variance(Sout.boot.out,estimator_St)
-  St.estimate.boot[,,,,,,"varest"]  <- Sout.variance$varest
-  St.estimate.boot[,,,,,,"varlo"]  <- Sout.variance$varlo
-  St.estimate.boot[,,,,,,"varhi"]  <- Sout.variance$varhi
+
+  if(!is.null(z.use) & !is.null(w.use)){
+    Ft.estimate.boot[,,,,,,"varest"]  <- Ft.variance$varest
+    Ft.estimate.boot[,,,,,,"varlo"]  <- Ft.variance$varlo
+    Ft.estimate.boot[,,,,,,"varhi"]  <- Ft.variance$varhi
+
+    St.estimate.boot[,,,,,,"varest"]  <- Sout.variance$varest
+    St.estimate.boot[,,,,,,"varlo"]  <- Sout.variance$varlo
+    St.estimate.boot[,,,,,,"varhi"]  <- Sout.variance$varhi
+
+  } else if(is.null(z.use) & is.null(w.use)){
+    Ft.estimate.boot[,,,,"varest"]  <- Ft.variance$varest
+    Ft.estimate.boot[,,,,"varlo"]  <- Ft.variance$varlo
+    Ft.estimate.boot[,,,,"varhi"]  <- Ft.variance$varhi
+
+    St.estimate.boot[,,,,"varest"]  <- Sout.variance$varest
+    St.estimate.boot[,,,,"varlo"]  <- Sout.variance$varlo
+    St.estimate.boot[,,,,"varhi"]  <- Sout.variance$varhi
+  }
+
+
 
   if(run.prediction.accuracy==TRUE){
     predict.variance <- get.my.variance(predict.boot.out,predict.differences)
@@ -1370,7 +1389,10 @@ estimator.main <- function(data,
                 mySout <- rep(0,m.tmp)
               }
               ## Repeat the estimates for Ft and St since these are the same for all covariate values.
+              print(method.label[kk])
+              print(myFest)
               Ft_test_out[,paste("Ft",1:p,sep="")] <- rep.row(myFest,nrow(Ft_test_out))
+
 
               Sout_test_out[,paste("St",1:m,sep="")] <- rep.row(mySout,nrow(Sout_test_out))
 
@@ -1506,10 +1528,17 @@ estimator.main <- function(data,
               } else{
                 ## take average over all (z,w) combinations
                 Ft.tmp.avg <- apply(Ft_test_out[,paste("Ft",1:p,sep="")],2,mean)
-                Ft.store[kk,tt,tt0,,,] <- repeat.zw(Ft.tmp.avg,z.use,w.use,p)
-
                 Sout.tmp.avg <- apply(Sout_test_out[,paste("St",1:m,sep="")],2,mean)
-                Sout.store[kk,tt,tt0,,,] <- repeat.zw(Sout.tmp.avg,z.use,w.use,m)
+
+                if(!is.null(z.use) & !is.null(w.use)){
+                  ## repeat the estimates for all (z,w) combinations
+                  Ft.store[kk,tt,tt0,,,] <- repeat.zw(Ft.tmp.avg,z.use,w.use,p)
+                  Sout.store[kk,tt,tt0,,,] <- repeat.zw(Sout.tmp.avg,z.use,w.use,m)
+                } else if(is.null(z.use) & is.null(w.use)){
+                  ## report the estimates
+                  Ft.store[kk,tt,tt0,] <- Ft.tmp.avg
+                  Sout.store[kk,tt,tt0,] <- Sout.tmp.avg
+                }
               }
             }
           }
