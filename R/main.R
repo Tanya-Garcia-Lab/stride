@@ -254,8 +254,16 @@ common_error_messages <- function(n,m,p,qvs,q,
   }
 
   ## check if w.use in the range of observed ww
-  if(any(w.use < min(ww) | w.use > max(ww) ) ){
-    warning("Not all values in w.use are in the range of observed W.")
+  if(!is.null(w.use)){
+
+    if(is.null(ww)){
+      stop("To evaluate the method(s) at w.use, you need to provide w-covariate values for each subject.")
+    }
+
+    if(any(w.use < min(ww) | w.use > max(ww) ) ){
+      warning("Not all values in w.use are in the range of observed W.")
+    }
+
   }
 
   ## update.qs must be FALSE
