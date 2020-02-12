@@ -1767,7 +1767,7 @@ match.names <- function(qvs.boot,qvs){
 #' for each person in the sample.
 #' @param delta a numeric vector of length \code{n} that denotes
 #' censoring (1 denotes event is observed, 0 denotes event is censored).
-#' @param t numeric value at which the distribution function is evaluated.
+#' @param timeval numeric value at which the distribution function is evaluated.
 #' @param qvs a numeric matrix of size \code{p} by \code{m} containing all possible
 #' mixture proportions (i.e., the probability of belonging to each population k, k=1,...,p.).
 #' @param p number of populations, must be at least 2.
@@ -1804,7 +1804,7 @@ match.names <- function(qvs.boot,qvs){
 #' @export
 #' @useDynLib stride
 stride.nocovariates <- function(n,q,x,delta,
-                                 t,qvs,p,m,r,
+                                 timeval,qvs,p,m,r,
                                  boot,bootvar,
                                  useOLS,useWLS,useEFF,
                                  useNPMLEs){
@@ -1813,7 +1813,7 @@ stride.nocovariates <- function(n,q,x,delta,
   storage.mode(q) <- "double"
   storage.mode(x) <- "double"
   storage.mode(delta) <- "double"
-  storage.mode(t) <- "double"
+  storage.mode(timeval) <- "double"
   storage.mode(qvs) <- "double"
   storage.mode(p) <- "integer"
   storage.mode(m) <- "integer"
@@ -1856,9 +1856,8 @@ stride.nocovariates <- function(n,q,x,delta,
   storage.mode(eflag) <- "integer"
   storage.mode(hts0) <- "double"
 
-  ##if(t>0){
   ## COMMENT THIS OUT FOR THE R PACKAGE
-  out <- .Fortran("kincohort_estimators",n,q,x,delta,t,qvs,p,m,r,lim,rat,setting,d,H0,
+  out <- .Fortran("kincohort_estimators",n,q,x,delta,timeval,qvs,p,m,r,lim,rat,setting,d,H0,
                   num_estimators,boot,bootvar,usetruth,useOLS,useWLS,useEFF,useNPMLEs,
                   hts0=hts0,
                   Fest=Fest,var_est=var_est,eflag=eflag,
@@ -1866,14 +1865,11 @@ stride.nocovariates <- function(n,q,x,delta,
 
 
   ## UNCOMMENT FOR RUNNING CODE IN UNIX
-  #  out <- .Fortran("kincohort_estimators",n,q,x,delta,t,qvs,p,m,r,lim,rat,setting,d,H0,
+  #  out <- .Fortran("kincohort_estimators",n,q,x,delta,timeval,qvs,p,m,r,lim,rat,setting,d,H0,
   #                  num_estimators,boot,bootvar,usetruth,useOLS,useWLS,useEFF,useNPMLEs,
   #                  hts0=hts0,
   #                  Fest=Fest,var_est=var_est,eflag=eflag)
 
-  ## } else {
-  ##   out <- list(hts0=hts0,Fest=Fest,var_est=var_est,eflag=eflag)
-  ## }
   list(hts0=out$hts0,Fest=out$Fest,var_est=out$var_est,eflag=out$eflag)
 }
 
