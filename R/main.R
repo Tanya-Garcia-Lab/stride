@@ -1398,7 +1398,8 @@ estimator.main <- function(data,
                                            useOLS=set.run$run.OLS,
                                            useWLS=set.run$run.WLS,
                                            useEFF=set.run$run.EFF,
-                                           useNPMLEs=set.run$run.NPMLEs)
+                                           useNPMLEs=set.run$run.NPMLEs,
+                                           useEMPAVA=set.run$run.EMPAVA)
         }
 
         for(tt in 1:length(tval)){
@@ -1427,7 +1428,8 @@ estimator.main <- function(data,
                                               useOLS=set.run$run.OLS,
                                               useWLS=set.run$run.WLS,
                                               useEFF=set.run$run.EFF,
-                                              useNPMLEs=set.run$run.NPMLEs)
+                                              useNPMLEs=set.run$run.NPMLEs,
+                                              useEMPAVA = set.run$run.EMPAVA)
 
               if(method.label[kk]=="NPMLE1"){
                 ## 1-S(t|t0,z,w)
@@ -1786,6 +1788,9 @@ match.names <- function(qvs.boot,qvs){
 #' @param useNPMLEs logical indicator. If TRUE, we compute the distribution function
 #' for the mixture data based on the type I and type II
 #' nonparametric maximum likelihood esimators (NPMLEs).
+#' @param useEMPAVA logical indicator. If TRUE, we compute the distribution function for the mixture data
+#' based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
+#' from isotone regression to yield a non-negative and monotone estimator.
 #'
 #' @return a list containing
 #' \itemize{
@@ -1806,8 +1811,10 @@ match.names <- function(qvs.boot,qvs){
 stride.nocovariates <- function(n,q,x,delta,
                                  timeval,qvs,p,m,r,
                                  boot,bootvar,
-                                 useOLS,useWLS,useEFF,
-                                 useNPMLEs){
+                                 useOLS,useWLS,
+                                 useEFF,
+                                 useNPMLEs,
+                                 useEMPAVA){
   ## set up for f90
   storage.mode(n) <- "integer"
   storage.mode(q) <- "double"
@@ -1825,50 +1832,62 @@ stride.nocovariates <- function(n,q,x,delta,
   storage.mode(useEFF) <- "logical"
   storage.mode(useNPMLEs) <- "logical"
 
-  num_estimators <- 11 ## fixed
-  storage.mode(num_estimators) <- "integer"
+  if(useOLS==TRUE | useWLS == TRUE | useEFF == TRUE | useNPMLEs==TRUE){
+    num_estimators <- 11 ## fixed
+    storage.mode(num_estimators) <- "integer"
 
-  ## set as standard values since we don't make use of these objects
-  lim <- 0; storage.mode(lim) <- "double"
-  rat <- 0; storage.mode(rat) <- "double"
-  setting <- "regcoxcase"; storage.mode(setting) <- "character"
-  d <- 0; storage.mode(d) <- "double"
-  H0 <- TRUE; storage.mode(H0) <- "logical"
-  usetruth <- FALSE; storage.mode(usetruth) <- "logical"
+    ## set as standard values since we don't make use of these objects
+    lim <- 0; storage.mode(lim) <- "double"
+    rat <- 0; storage.mode(rat) <- "double"
+    setting <- "regcoxcase"; storage.mode(setting) <- "character"
+    d <- 0; storage.mode(d) <- "double"
+    H0 <- TRUE; storage.mode(H0) <- "logical"
+    usetruth <- FALSE; storage.mode(usetruth) <- "logical"
 
-  ## prepare output
-  mylabel <- c("IPW","AIPW","IMP")
-  Fest <- array(0,dim=c(p,num_estimators),dimnames=list(paste("p",1:p,sep=""),
-                                                        c(paste("OLS",mylabel,sep=""),
-                                                          paste("WLS",mylabel,sep=""),
-                                                          paste("EFF",mylabel,sep=""),
-                                                          paste("NPMLE",1:2,sep=""))))
-  var_est <- array(0,dim=c(p,p,num_estimators),dimnames=list(paste("p",1:p,sep=""),
-                                                             paste("p",1:p,sep=""),
-                                                             c(paste("OLS",mylabel,sep=""),
-                                                               paste("WLS",mylabel,sep=""),
-                                                               paste("EFF",mylabel,sep=""),
-                                                               paste("NPMLE",1:2,sep=""))))
-  hts0 <- rep(0,m)
-  eflag <- 0
-  storage.mode(Fest) <- "double"
-  storage.mode(var_est) <- "double"
-  storage.mode(eflag) <- "integer"
-  storage.mode(hts0) <- "double"
+    ## prepare output
+    mylabel <- c("IPW","AIPW","IMP")
 
-  ## COMMENT THIS OUT FOR THE R PACKAGE
-  out <- .Fortran("kincohort_estimators",n,q,x,delta,timeval,qvs,p,m,r,lim,rat,setting,d,H0,
-                  num_estimators,boot,bootvar,usetruth,useOLS,useWLS,useEFF,useNPMLEs,
-                  hts0=hts0,
-                  Fest=Fest,var_est=var_est,eflag=eflag,
-                  PACKAGE="stride")
+    Fest <- array(0,dim=c(p,num_estimators),dimnames=list(paste("p",1:p,sep=""),
+                                                          c(paste("OLS",mylabel,sep=""),
+                                                            paste("WLS",mylabel,sep=""),
+                                                            paste("EFF",mylabel,sep=""),
+                                                            paste("NPMLE",1:2,sep=""))))
+
+    var_est <- array(0,dim=c(p,p,num_estimators),dimnames=list(paste("p",1:p,sep=""),
+                                                               paste("p",1:p,sep=""),
+                                                               c(paste("OLS",mylabel,sep=""),
+                                                                 paste("WLS",mylabel,sep=""),
+                                                                 paste("EFF",mylabel,sep=""),
+                                                                 paste("NPMLE",1:2,sep=""))))
+    hts0 <- rep(0,m)
+    eflag <- 0
+    storage.mode(Fest) <- "double"
+    storage.mode(var_est) <- "double"
+    storage.mode(eflag) <- "integer"
+    storage.mode(hts0) <- "double"
+
+    ## COMMENT THIS OUT FOR THE R PACKAGE
+    out <- .Fortran("kincohort_estimators",n,q,x,delta,timeval,qvs,p,m,r,lim,rat,setting,d,H0,
+                    num_estimators,boot,bootvar,usetruth,useOLS,useWLS,useEFF,useNPMLEs,
+                    hts0=hts0,
+                    Fest=Fest,var_est=var_est,eflag=eflag,
+                    PACKAGE="stride")
 
 
-  ## UNCOMMENT FOR RUNNING CODE IN UNIX
-  #  out <- .Fortran("kincohort_estimators",n,q,x,delta,timeval,qvs,p,m,r,lim,rat,setting,d,H0,
-  #                  num_estimators,boot,bootvar,usetruth,useOLS,useWLS,useEFF,useNPMLEs,
-  #                  hts0=hts0,
-  #                  Fest=Fest,var_est=var_est,eflag=eflag)
+    ## UNCOMMENT FOR RUNNING CODE IN UNIX
+    #  out <- .Fortran("kincohort_estimators",n,q,x,delta,timeval,qvs,p,m,r,lim,rat,setting,d,H0,
+    #                  num_estimators,boot,bootvar,usetruth,useOLS,useWLS,useEFF,useNPMLEs,
+    #                  hts0=hts0,
+    #                  Fest=Fest,var_est=var_est,eflag=eflag)
+  } else if(useEMPAVA==TRUE){
+    out <- NULL
+
+    Fest <- array(0,dim=c(p,1),dimnames=list(paste0("p",1:p),"EMPAVA"))
+
+    ## add estimation of EM-PAVA
+    out$Fest <- Fest
+
+  }
 
   list(hts0=out$hts0,Fest=out$Fest,var_est=out$var_est,eflag=out$eflag)
 }
@@ -2185,7 +2204,8 @@ kin.updateq <- function(data,n,p,m,r.orig,qvs.orig,q.orig,t0,method.label){
                                     useOLS=set.run$run.OLS,
                                     useWLS=set.run$run.WLS,
                                     useEFF=set.run$run.EFF,
-                                    useNPMLEs=set.run$run.NPMLEs)
+                                    useNPMLEs=set.run$run.NPMLEs,
+                                    useEMPAVA = set.run$run.EMPAVA)
 
     Fest.tmp <- t(kin.out$Fest[,method.label[kk]])
 
