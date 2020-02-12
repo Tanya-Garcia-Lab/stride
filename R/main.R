@@ -227,7 +227,9 @@ common_error_messages <- function(n,m,p,qvs,q,
   }
 
   ## check if zz is of length n
-  stop_length_message(zz,n)
+  if(!is.null(zz)){
+    stop_length_message(zz,n)
+  }
 
   ## check if tval >=0
   error_nonpositive_value(tval,get_variable_name(tval))
