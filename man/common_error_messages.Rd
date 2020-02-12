@@ -51,10 +51,10 @@ for each person in the sample.}
 censoring (1 denotes event is observed, 0 denotes event is censored).}
 
 \item{ww}{a numeric vector of length \code{n} containing the values of the continuous
-covariate for each person in the sample.}
+covariate for each person in the sample. Can be NULL.}
 
 \item{zz}{a numeric vector of length \code{n} containing the values of the discrete
-covariate for each person in the sample.}
+covariate for each person in the sample. Can be NULL.}
 
 \item{run.NPMLEs}{a logical indicator. If TRUE, then the output includes the
 estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
@@ -97,10 +97,10 @@ be non-negative.}
 and smaller than the maximum of \code{tval}.}
 
 \item{z.use}{numeric vector at which to evaluate the discrete covariate \eqn{Z} at in the estimated distribution function.
-The values of \code{z.use} must be in the range of the observed \code{zz}.}
+The values of \code{z.use} must be in the range of the observed \code{zz}. Can be NULL.}
 
 \item{w.use}{numeric vector at which to evaluate the continuous covariate \eqn{W} at in the estimated distribution function.
-The values of \code{w.use} must be in the range of the observed \code{ww}.}
+The values of \code{w.use} must be in the range of the observed \code{ww}. Can be NULL.}
 
 \item{update.qs}{logical indicator. If TRUE, the mixture proportions \code{q} will be updated. This is currently not implemented.}
 

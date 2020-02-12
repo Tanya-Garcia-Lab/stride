@@ -1877,6 +1877,12 @@ kincohort.estimators <- function(n,q,x,delta,
 }
 
 
+
+#############################################
+## functions to run EM-PAVA estimators     ##
+#############################################
+
+
 #' Alpha quantile
 #'
 #' Computes the alpha-quantile of a vector \code{x}.

@@ -4,7 +4,7 @@ censoring.rate <- 40
 p <- 2
 n <- 2000
 m <- 4
-tval <- seq(20,40,60,80)
+tval <- c(20,40,60,80)
 tval0 <- c(0)
 z.use <- c(0,1)
 w.use <- seq(35,55,by=1)
