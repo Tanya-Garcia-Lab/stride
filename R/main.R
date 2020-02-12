@@ -1569,12 +1569,14 @@ estimator.main <- function(data,
               ## output results at specific (z,w) ##
               ######################################
               if(method.label[kk]!="NPNA_avg"){
-                Ft.store[kk,tt,tt0,,,] <- unflatten.array(Ft.store[kk,tt,tt0,,,],
+                Ft.store[kk,tt,tt0,,,] <- unflatten.array(abind::drop(Ft.store[kk,tt,tt0,,,,drop=FALSE],
+                                                                    drop=c(1,2,3)),
                                                           dim.order=c("zz","ww","Ft"),
                                                           Ft_test_out[,paste("Ft",1:p,sep="")],
                                                           flatten.name="Ft")
 
-                Sout.store[kk,tt,tt0,,,] <- unflatten.array(Sout.store[kk,tt,tt0,,,],
+                Sout.store[kk,tt,tt0,,,] <- unflatten.array(abind::drop(Sout.store[kk,tt,tt0,,,,drop=FALSE],
+                                                                        drop=c(1,2,3)),
                                                             dim.order=c("zz","ww","Ft"),
                                                             Sout_test_out[,paste("St",1:m,sep="")],
                                                             flatten.name="Ft")
