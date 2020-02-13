@@ -61,7 +61,7 @@ covariate for each person in the sample. Can be NULL.}
 estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
 estimators. The type I nonparametric maximum likelihood estimator is referred
 to as the "Kaplan-Meier" estimator in Garcia and Parast (2020). Neither the type I nor type II
-include covariates or dynamic landmarking.}
+adjust for covariates.}
 
 \item{run.NPNA}{a logical indicator. If TRUE, then the output includes the
 estimated distribution function for mixture data that accounts for covariates and dynamic
@@ -72,28 +72,32 @@ estimated distribution function for mixture data that averages out over the obse
 This is referred to as NPNA_marg in Garcia and Parast (2020).}
 
 \item{run.NPNA_wrong}{a logical indicator. If TRUE, then the output includes the
-estimated distribution function for mixture data that ignores landmarking. This is referred to as
-NPNA_{t_0=0} in the paper.}
+estimated distribution function for mixture data that adjusts for covariates, but
+ignores landmarking. This is referred to as NPNA_{t_0=0} in Garcia and Parast (2020).}
 
 \item{run.OLS}{a logical indicator. If TRUE, then the output includes the estimated distribution function
-computed using an ordinary least squares influence function that adjusts for censoring using
+computed using an ordinary least squares influence function. The estimator adjusts for censoring using
 inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.}
+and imputation (IMP). See details in Wang et al (2012). These estimators do not
+adjust for covariates.}
 
 \item{run.WLS}{a logical indicator. If TRUE, then the output includes the estimated distribution function
-computed using a weighted least squares influence function that adjusts for censoring using
+computed using a weighted least squares influence function. The estimator adjusts for censoring using
 inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.}
+and imputation (IMP). See details in Wang et al (2012). These estimators do not
+adjust for covariates.}
 
 \item{run.EFF}{a logical indicator. If TRUE, then the output includes the estimated distribution function
 computed using the efficient influence function based on Hilbert space projection theory results.
 The estimator adjusts for censoring using
 inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.}
+and imputation (IMP). See details in Wang et al (2012). These estimators do not
+adjust for covariates.}
 
 \item{run.EMPAVA}{logical indicator. If TRUE, we compute the distribution function for the mixture data
 based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
-from isotone regression to yield a non-negative and monotone estimator.}
+from isotone regression to yield a non-negative and monotone estimator. This estimator does not adjust
+for covariates. See details in Qing et al (2014).}
 
 \item{tval}{numeric vector of time points at which the distribution function is evaluated, all values must
 be non-negative.}

@@ -90,6 +90,9 @@ run.WLS <- FALSE
 ##run.EFF <- TRUE # If TRUE, then the output includes the estimated distribution function computed using the efficient influence function based on Hilbert space projection theory that adjusts for censoring using inverse probability weighting (IPW), augmented inverse probability weighting (AIPW), and imputation (IMP). See details in Wang et al (2012). 
 run.EFF <- FALSE
 
+##run.EMPAVA <- TRUE # If TRUE, we compute the distribution function for the mixture data based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA) from isotone regression to yield a non-negative and monotone estimator. See details in Qing et al (2014)
+run.EMPAVA <- FALSE
+
 run.NPNA <- FALSE
 run.NPNA_avg <- FALSE
 run.NPNA_wrong <- FALSE
@@ -119,6 +122,7 @@ estimators.out <- stride.estimator(n,m,p,qvs,q,
 				run.OLS,
         run.WLS,
         run.EFF,
+				run.EMPAVA,
 				tval,tval0,
 				z.use,w.use,
 				update.qs,
@@ -167,6 +171,7 @@ run.NPNA_wrong <- FALSE
 run.OLS <- FALSE
 run.WLS <- FALSE
 run.EFF <- FALSE
+run.EMPAVA <- FALSE
 
 
 ## The distribution function we are estimating is F(t|t0,z,w). 
@@ -193,6 +198,7 @@ estimators.out <- stride.estimator(n,m,p,qvs,q,
 				run.OLS,
         run.WLS,
         run.EFF,
+				run.EMPAVA,
 				tval,tval0,
 				z.use,w.use,
 				update.qs,
