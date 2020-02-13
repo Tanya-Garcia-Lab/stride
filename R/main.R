@@ -9,6 +9,160 @@
 ##
 ####################################
 
+#' Wrapper function to access STRIDE estimator
+#'
+#' Checks for common errors in user input, assembles data user provides and applies STRIDE estimators.
+#'
+#' @param n sample size, must be at least 1.
+#' @param m number of different mixture proportions, must be at least 2.
+#' @param p number of populations, must be at least 2.
+#' @param qvs a numeric matrix of size \code{p} by \code{m} containing all possible
+#' mixture proportions (i.e., the probability of belonging to each population k, k=1,...,p.).
+#' @param q a numeric matrix of size \code{p} by \code{n} containing the
+#' mixture proportions for each person in the sample.
+#' @param x a numeric vector of length \code{n} containing the observed event times
+#' for each person in the sample.
+#' @param delta a numeric vector of length \code{n} that denotes
+#' censoring (1 denotes event is observed, 0 denotes event is censored).
+#' @param ww a numeric vector of length \code{n} containing the values of the continuous
+#' covariate for each person in the sample. Can be NULL.
+#' @param zz a numeric vector of length \code{n} containing the values of the discrete
+#' covariate for each person in the sample. Can be NULL.
+#' @param run.NPMLEs a logical indicator. If TRUE, then the output includes the
+#' estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
+#' estimators. The type I nonparametric maximum likelihood estimator is referred
+#' to as the "Kaplan-Meier" estimator in Garcia and Parast (2020). Neither the type I nor type II
+#' adjust for covariates.
+#' @param run.NPNA a logical indicator. If TRUE, then the output includes the
+#' estimated distribution function for mixture data that accounts for covariates and dynamic
+#' landmarking. This estimator is called "NPNA" in Garcia and Parast (2020).
+#' @param run.NPNA_avg a logical indicator. If TRUE, then the output includes the
+#' estimated distribution function for mixture data that averages out over the observed covariates.
+#' This is referred to as NPNA_marg in Garcia and Parast (2020).
+#' @param run.NPNA_wrong a logical indicator. If TRUE, then the output includes the
+#' estimated distribution function for mixture data that adjusts for covariates, but
+#' ignores landmarking. This is referred to as NPNA_{t_0=0} in Garcia and Parast (2020).
+#' @param run.OLS a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using an ordinary least squares influence function. The estimator adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
+#' @param run.WLS  a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using a weighted least squares influence function. The estimator adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
+#' @param run.EFF  a logical indicator. If TRUE, then the output includes the estimated distribution function
+#' computed using the efficient influence function based on Hilbert space projection theory results.
+#' The estimator adjusts for censoring using
+#' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
+#' @param run.EMPAVA logical indicator. If TRUE, we compute the distribution function for the mixture data
+#' based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
+#' from isotone regression to yield a non-negative and monotone estimator. This estimator does not adjust
+#' for covariates.  See details in Qing et al (2014).
+#' @param tval numeric vector of time points at which the distribution function is evaluated, all values must
+#' be non-negative.
+#' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
+#' and smaller than the maximum of \code{tval}.
+#' @param z.use numeric vector at which to evaluate the discrete covariate \eqn{Z} at in the estimated distribution function.
+#' The values of \code{z.use} must be in the range of the observed \code{zz}.  Can be NULL.
+#' @param w.use numeric vector at which to evaluate the continuous covariate \eqn{W} at in the estimated distribution function.
+#' The values of \code{w.use} must be in the range of the observed \code{ww}.  Can be NULL.
+#' @param update.qs logical indicator. If TRUE, the mixture proportions \code{q} will be updated.
+#' This is currently not implemented.
+#' @param know.true.groups logical indicator. If TRUE, then we know the population identifier for each person in the sample.
+#' This option is only used for simulation studies to check prediction accuracy. Default is FALSE.
+#' @param true.group.identifier numeric vector of length \code{n} denoting the
+#' population identifier for each person in the sample.
+#' Default is NULL.
+#' @param run.prediction.accuracy logical indicator. If TRUE, then we compute the prediction accuracy measures, including the
+#' area under the receiver operating characteristic curve (AUC) and the Brier Score (BS). Prediction accuracy is only valid
+#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
+#' @param do_cross_validation_AUC_BS logical indicator. If TRUE, then we compute the prediction accuracy measures, including the
+#' area under the receiver operating characteristic curve (AUC) and the Brier Score (BS) using cross-validation. Prediction accuracy is only valid
+#' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
+#'
+#' @section Details:
+#' We estimate nonparametric distribution functions for mixture data  where
+#' the population identifiers are unknown, and the probability of belonging
+#' to a population is known (typically estimated with external data).
+#' The distribution functions are evaluated at
+#' time points \code{tval}. All estimators adjust for dynamic landmark prediction.
+#' Dynamic landmark prediction means that the distribution function is computed knowing
+#' that the survival time, \eqn{T}, satisfies \eqn{T >t_0}
+#' where \eqn{t_0} are the time points in \code{tval0}. The NPNA, NPNA_avg,
+#' and NPNA_wrog adjust for one discrete covariate (\code{zz}) and one continuous covariate (\code{ww}).
+#'
+#' @references
+#' Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
+#'
+#' Garcia, T.P., Marder, K. and Wang, Y. (2017). Statistical modeling of Huntington disease onset.
+#' In Handbook of Clinical Neurology, vol 144, 3rd Series, editors Andrew Feigin and Karen E. Anderson.
+#'
+#' Qing, J., Garcia, T.P., Ma, Y., Tang, M.X., Marder, K., and Wang, Y. (2014).
+#' Combining isotonic regression and EM algorithm to predict genetic risk under monotonicity constraint.
+#' Annals of Applied Statistics, 8(2), 1182-1208.
+#'
+#' Wang, Y., Garcia, T.P., and Ma. Y. (2012).  Nonparametric estimation for censored mixture data with
+#' application to the Cooperative Huntington's Observational Research Trial. Journal of the American Statistical Association,
+#' 107, 1324-1338.
+#'
+#'
+#' @return \code{stride.wrapper.estimator} returns a list containing
+#' \itemize{
+#'    \item{problem: }{a numeric indicator of errors in the NPNA, NPNA_avg, NPNA_wrong estimator. If NULL, no error is reported.
+#'    Otherwise, there is an error in the computation of the NPNA, NPNA_avg, or NPNA_wrong estimator.}
+#'
+#'    \item{Ft.estimate: }{a numeric array containing the estimated distribution functions for all methods for all
+#'    \code{p} populations. The distribution function is evaluated at each \code{tval},
+#'    \code{tval0}, \code{z.use} (if non-NULL), \code{w.use} (if non-NULL), and for all \code{p} populations.
+#'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
+#'    \code{length(z.use)} by \code{length(w.use)} by \code{p}. If \code{z.use} and \code{w.use} are NULL,
+#'    the dimension of the array is  \# of methods by \code{length(tval)} by \code{lenth(tval0)} by \code{p}. The distribution function is only valid for \eqn{t\geq t_0}, so
+#'    \code{Ft.estimate} shows NA for any combination for which \eqn{t<t_0}.
+#'    }
+#'
+#'    \item {St.estimate: }{a numeric array containing the estimated distribution functions for all methods
+#'    for all \code{m} mixture proportion subgroups. The distribution function is evaluated
+#'    at each \code{tval}, \code{tval0}, \code{z.use} (if non-NULL), \code{w.use} (if non-NULL), and for all \code{m} mixture
+#'    proportion subgroups.
+#'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
+#'    \code{length(z.use)} by \code{length(w.use)} by \code{m}. If \code{z.use} and \code{w.use} are NULL,
+#'    the dimension of the array   is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by \code{m}.  The distribution function is only valid for \eqn{t\geq t_0}, so
+#'    \code{St.estimate} shows NA for any combination for which \eqn{t<t_0}.
+#'    }
+#'
+#'    \item{Ft.AUC.BS: }{a numeric array containing the
+#'    area under the receiver operating characteristic curve (AUC) and
+#'    Brier Score (BS) for the \code{p} populations. The dimension of the array is \# of methods by
+#'    \code{length(tval)} by \code{length(tval0)} by 2,
+#'    where the last dimension stores the AUC and BS results.
+#'
+#'    Results for both the estimated distributon functions and prediction
+#'    accuracy measures (AUC, BS) are only valid when \eqn{t\geq t_0}, so
+#'    arrays show NA for any combination for which \eqn{t<t_0}.
+#'
+#'    }
+#'
+#'    \item {St.AUC.BS: }{a numeric array containing the results are the
+#'    area under the receiver operating characteristic curve (AUC) and
+#'    Brier Score (BS) for the \code{m} mixture proportion groups.
+#'    The dimension of the array is \# of methods by
+#'    \code{length(tval)} by \code{length(tval0)} by 2,
+#'    where the last dimension stores the AUC and BS results.
+#'
+#'    Results for both the estimated distributon functions and prediction
+#'    accuracy measures (AUC, BS) are only valid when \eqn{t\geq t_0}, so
+#'    arrays show NA for any combination for which \eqn{t<t_0}.
+#'
+#'    }
+#'
+#' }
+#'
+#'
+#' @export
 stride.estimator.wrapper <- function(
   n,m,p,qvs,q,
   x,delta,ww,zz,
@@ -130,7 +284,7 @@ stride.estimator.wrapper <- function(
 #' estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
 #' estimators. The type I nonparametric maximum likelihood estimator is referred
 #' to as the "Kaplan-Meier" estimator in Garcia and Parast (2020). Neither the type I nor type II
-#' include covariates or dynamic landmarking.
+#' adjust for covariates.
 #' @param run.NPNA a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that accounts for covariates and dynamic
 #' landmarking. This estimator is called "NPNA" in Garcia and Parast (2020).
@@ -138,24 +292,28 @@ stride.estimator.wrapper <- function(
 #' estimated distribution function for mixture data that averages out over the observed covariates.
 #' This is referred to as NPNA_marg in Garcia and Parast (2020).
 #' @param run.NPNA_wrong a logical indicator. If TRUE, then the output includes the
-#' estimated distribution function for mixture data that ignores landmarking. This is referred to as
-#' NPNA_{t_0=0} in the paper.
+#' estimated distribution function for mixture data that adjusts for covariates, but
+#' ignores landmarking. This is referred to as NPNA_{t_0=0} in Garcia and Parast (2020).
 #' @param run.OLS a logical indicator. If TRUE, then the output includes the estimated distribution function
-#' computed using an ordinary least squares influence function that adjusts for censoring using
+#' computed using an ordinary least squares influence function. The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
 #' @param run.WLS  a logical indicator. If TRUE, then the output includes the estimated distribution function
-#' computed using a weighted least squares influence function that adjusts for censoring using
+#' computed using a weighted least squares influence function. The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
 #' @param run.EFF  a logical indicator. If TRUE, then the output includes the estimated distribution function
 #' computed using the efficient influence function based on Hilbert space projection theory results.
 #' The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
 #' @param run.EMPAVA logical indicator. If TRUE, we compute the distribution function for the mixture data
 #' based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
-#' from isotone regression to yield a non-negative and monotone estimator.
+#' from isotone regression to yield a non-negative and monotone estimator. This estimator does not adjust
+#' for covariates. See details in Qing et al (2014).
 #' @param tval numeric vector of time points at which the distribution function is evaluated, all values must
 #' be non-negative.
 #' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
@@ -310,13 +468,15 @@ common_error_messages <- function(n,m,p,qvs,q,
   }
 }
 
-#' Dynamic landmark prediction estimator for mixture data with covariates
+#' STRIDE: Robust powerful mixture models
 #'
-#' Estimates the distribution function for mixture data where
-#' the population identifiers are unknown, but the probability of belonging
-#' to a population is known. The distribution functions are evaluated at
-#' time points \code{tval} and adjust for dynamic landmark prediction and one
-#' discrete covariate (\code{zz}) and one continuous covariate (\code{ww}).
+#' STRIDE estimators are nonparametric estimates of  the distribution function for mixture data where
+#' the population identifiers are unknown, and the probability of belonging
+#' to a population is known (typically estimated with external data).
+#' The distribution functions are evaluated at
+#' time points \code{tval}. All STRIDE estimators can adjust for dynamic landmark prediction. The NPNA,
+#' NPNA_avg and NPNA_wrong estimators can adjust for one
+#' discrete covariate (\code{zz}) and one continuous covariate (\code{ww}). See details below.
 #'
 #' @param n sample size, must be at least 1.
 #' @param m number of different mixture proportions, must be at least 2.
@@ -337,32 +497,36 @@ common_error_messages <- function(n,m,p,qvs,q,
 #' estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
 #' estimators. The type I nonparametric maximum likelihood estimator is referred
 #' to as the "Kaplan-Meier" estimator in Garcia and Parast (2020). Neither the type I nor type II
-#' include covariates or dynamic landmarking.
+#' adjust for covariates.
 #' @param run.NPNA a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that accounts for covariates and dynamic
 #' landmarking. This estimator is called "NPNA" in Garcia and Parast (2020).
 #' @param run.NPNA_avg a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that averages out over the observed covariates.
-#' This is referred to as NPNA_marg in Garcia and Parast (2020)..
+#' This is referred to as NPNA_marg in Garcia and Parast (2020).
 #' @param run.NPNA_wrong a logical indicator. If TRUE, then the output includes the
-#' estimated distribution function for mixture data that ignores landmarking. This is referred to as
-#' NPNA_{t_0=0} in the paper.
+#' estimated distribution function for mixture data that adjusts for covariates, but
+#' ignores landmarking. This is referred to as NPNA_{t_0=0} in Garcia and Parast (2020).
 #' @param run.OLS a logical indicator. If TRUE, then the output includes the estimated distribution function
-#' computed using an ordinary least squares influence function that adjusts for censoring using
+#' computed using an ordinary least squares influence function. The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
 #' @param run.WLS  a logical indicator. If TRUE, then the output includes the estimated distribution function
-#' computed using a weighted least squares influence function that adjusts for censoring using
+#' computed using a weighted least squares influence function. The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
 #' @param run.EFF  a logical indicator. If TRUE, then the output includes the estimated distribution function
 #' computed using the efficient influence function based on Hilbert space projection theory results.
 #' The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
 #' @param run.EMPAVA logical indicator. If TRUE, we compute the distribution function for the mixture data
 #' based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
-#' from isotone regression to yield a non-negative and monotone estimator.
+#' from isotone regression to yield a non-negative and monotone estimator. This estimator does not adjust
+#' for covariates.  See details in Qing et al (2014).
 #' @param tval numeric vector of time points at which the distribution function is evaluated, all values must
 #' be non-negative.
 #' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
@@ -384,14 +548,15 @@ common_error_messages <- function(n,m,p,qvs,q,
 #' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
 #'
 #' @section Details:
-#' We estimate the distribution function for mixture data  where
-#' the population identifiers are unknown, but the probability of belonging
-#' to a population is known. The distribution functions are evaluated at
-#' time points \code{tval} and adjust for dynamic landmark prediction and one
-#' discrete covariate (\code{zz}) and one continuous covariate (\code{ww}).
+#' We estimate nonparametric distribution functions for mixture data  where
+#' the population identifiers are unknown, and the probability of belonging
+#' to a population is known (typically estimated with external data).
+#' The distribution functions are evaluated at
+#' time points \code{tval}. All estimators adjust for dynamic landmark prediction.
 #' Dynamic landmark prediction means that the distribution function is computed knowing
 #' that the survival time, \eqn{T}, satisfies \eqn{T >t_0}
-#' where \eqn{t_0} are the time points in \code{tval0}.
+#' where \eqn{t_0} are the time points in \code{tval0}. The NPNA, NPNA_avg,
+#' and NPNA_wrog adjust for one discrete covariate (\code{zz}) and one continuous covariate (\code{ww}).
 #'
 #' @references
 #' Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
@@ -577,7 +742,7 @@ stride.estimator <- function(n,m,p,qvs,q,
 #' estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
 #' estimators. The type I nonparametric maximum likelihood estimator is referred
 #' to as the "Kaplan-Meier" estimator in Garcia and Parast (2020). Neither the type I nor type II
-#' include covariates or dynamic landmarking.
+#' adjust for covariates.
 #' @param run.NPNA a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that accounts for covariates and dynamic
 #' landmarking. This estimator is called "NPNA" in Garcia and Parast (2020).
@@ -585,24 +750,28 @@ stride.estimator <- function(n,m,p,qvs,q,
 #' estimated distribution function for mixture data that averages out over the observed covariates.
 #' This is referred to as NPNA_marg in Garcia and Parast (2020).
 #' @param run.NPNA_wrong a logical indicator. If TRUE, then the output includes the
-#' estimated distribution function for mixture data that ignores landmarking. This is referred to as
-#' NPNA_{t_0=0} in the paper.
+#' estimated distribution function for mixture data that adjusts for covariates, but
+#' ignores landmarking. This is referred to as NPNA_{t_0=0} in Garcia and Parast (2020).
 #' @param run.OLS a logical indicator. If TRUE, then the output includes the estimated distribution function
-#' computed using an ordinary least squares influence function that adjusts for censoring using
+#' computed using an ordinary least squares influence function. The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
 #' @param run.WLS  a logical indicator. If TRUE, then the output includes the estimated distribution function
-#' computed using a weighted least squares influence function that adjusts for censoring using
+#' computed using a weighted least squares influence function. The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
 #' @param run.EFF  a logical indicator. If TRUE, then the output includes the estimated distribution function
 #' computed using the efficient influence function based on Hilbert space projection theory results.
 #' The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
 #' @param run.EMPAVA logical indicator. If TRUE, we compute the distribution function for the mixture data
 #' based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
-#' from isotone regression to yield a non-negative and monotone estimator.
+#' from isotone regression to yield a non-negative and monotone estimator. This estimator does not adjust
+#' for covariates.  See details in Qing et al (2014).
 #' @param tval numeric vector of time points at which the distribution function is evaluated, all values must
 #' be non-negative.
 #' @param tval0 numeric vector of time points representing the landmark times. All values must be non-negative
@@ -615,26 +784,14 @@ stride.estimator <- function(n,m,p,qvs,q,
 #' @param know.true.groups logical indicator. If TRUE, then we know the population identifier for each person in the sample.
 #' This option is only used for simulation studies. Default is FALSE.
 #' @param estimator_Ft a numeric array of the estimated distribution functions for all \code{p} populations.
-#'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
-#'    \code{length(z.use)} by \code{length(w.use)} by \code{p}.
-#' 	Results are only valid when \eqn{t\geq t_0}, so arrays show NA for any combination for which \eqn{t<t_0}.
+#' This is outputted from the function \code{stride.estimator}.
 #' @param estimator_St a numeric array of the estimated distribution functions for all \code{m} mixture proportion groups.
-#'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
-#'    \code{length(z.use)} by \code{length(w.use)} by \code{m}.
-#' 	Results are only valid when \eqn{t\geq t_0}, so arrays show NA for any combination for which \eqn{t<t_0}.
+#' This is output from the function \code{stride.estimator}.
 #' @param AUC_BS_Ft a numeric array of the area under the receiver operating characteristic curve (AUC) and
-#'    Brier Score (BS) for the \code{p} populations. The dimension of the array is \# of methods by
-#'    \code{length(tval)} by \code{length(tval0)} by 2,
-#'    where the last dimension stores the AUC and BS results.
-#' 	Results are only valid when \eqn{t\geq t_0}, so arrays show NA for any combination for which \eqn{t<t_0}.
+#'    Brier Score (BS) for the \code{p} populations. This is output from the function \code{stride.estimator}.
 #' @param AUC_BS_St a numeric array of the area under the receiver operating characteristic curve (AUC) and
-#'    Brier Score (BS) for the \code{m} mixture proportion groups.
-#'    The dimension of the array is \# of methods by
-#'    \code{length(tval)} by \code{length(tval0)} by 2,
-#'    where the last dimension stores the AUC and BS results.
-#'    Results are only valid when \eqn{t\geq t_0}, so
-#'    arrays show NA for any combination for which \eqn{t<t_0}.
-#'
+#'    Brier Score (BS) for the \code{m} mixture proportion groups. This is output from
+#'    the function \code{stride.estimator}.
 #' @param true.group.identifier numeric vector of length \code{n} denoting the population identifier for each person in the sample.
 #' Default is NULL.
 #' @param run.prediction.accuracy logical indicator. If TRUE, then we compute the prediction accuracy measures, including the
@@ -1156,14 +1313,15 @@ sum_array_na <- function(m1,m2){
 #' in simulation studies where \code{know.true.groups}=TRUE and \code{true.group.identifier} is available.
 #'
 #' @section Details:
-#' We estimate the distribution function for mixture data  where
-#' the population identifiers are unknown, but the probability of belonging
-#' to a population is known. The distribution functions are evaluated at
-#' time points \code{tval} and adjust for dynamic landmark prediction and one
-#' discrete covariate (\code{zz}) and one continuous covariate (\code{ww}).
+#' We estimate nonparametric distribution functions for mixture data  where
+#' the population identifiers are unknown, and the probability of belonging
+#' to a population is known (typically estimated with external data).
+#' The distribution functions are evaluated at
+#' time points \code{tval}. All estimators adjust for dynamic landmark prediction.
 #' Dynamic landmark prediction means that the distribution function is computed knowing
 #' that the survival time, \eqn{T}, satisfies \eqn{T >t_0}
-#' where \eqn{t_0} are the time points in \code{tval0}.
+#' where \eqn{t_0} are the time points in \code{tval0}. The NPNA, NPNA_avg,
+#' and NPNA_wrog adjust for one discrete covariate (\code{zz}) and one continuous covariate (\code{ww}).
 #'
 #' @references
 #' Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
@@ -1186,7 +1344,8 @@ sum_array_na <- function(m1,m2){
 #'    \code{run.prediction.accuracy} is FALSE, then the results are the
 #'    the estimated distribution functions for all \code{p} populations.
 #'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
-#'    \code{length(z.use)} by \code{length(w.use)} by \code{p}.
+#'    \code{length(z.use)} (when \code{z.use} is non-NULL) by \code{length(w.use)}
+#'    (when \code{w.use} is non-NULL) by \code{p}.
 #'
 #'    When \code{run.prediction.accuracy} is TRUE, then the results are the
 #'    area under the receiver operating characteristic curve (AUC) and
@@ -1205,7 +1364,8 @@ sum_array_na <- function(m1,m2){
 #'    the estimated distribution functions for all \code{m} mixture proportion
 #'    groups.
 #'    The dimension of the array is \# of methods by \code{length(tval)} by \code{lenth(tval0)} by
-#'    \code{length(z.use)} by \code{length(w.use)} by \code{m}.
+#'    \code{length(z.use)} (when \code{z.use} is non-NULL)
+#'    by \code{length(w.use)} (when \code{w.use} is non-NULL) by \code{m}.
 #'
 #'    When \code{run.prediction.accuracy} is TRUE, then the results are the
 #'    area under the receiver operating characteristic curve (AUC) and
@@ -1652,7 +1812,7 @@ estimator.main <- function(data,
 #' estimated distribution function for mixture data based on the type-I and type II nonparametric maximum likelihood
 #' estimators. The type I nonparametric maximum likelihood estimator is referred
 #' to as the "Kaplan-Meier" estimator in Garcia and Parast (2020). Neither the type I nor type II
-#' include covariates or dynamic landmarking.
+#' adjust for covariates.
 #' @param run.NPNA a logical indicator. If TRUE, then the output includes the
 #' estimated distribution function for mixture data that accounts for covariates and dynamic
 #' landmarking. This estimator is called "NPNA" in Garcia and Parast (2020).
@@ -1660,24 +1820,28 @@ estimator.main <- function(data,
 #' estimated distribution function for mixture data that averages out over the observed covariates.
 #' This is referred to as NPNA_marg in Garcia and Parast (2020).
 #' @param run.NPNA_wrong a logical indicator. If TRUE, then the output includes the
-#' estimated distribution function for mixture data that ignores landmarking. This is referred to as
-#' NPNA_{t_0=0} in the paper.
+#' estimated distribution function for mixture data that adjusts for covariates, but
+#' ignores landmarking. This is referred to as NPNA_{t_0=0} in Garcia and Parast (2020).
 #' @param run.OLS a logical indicator. If TRUE, then the output includes the estimated distribution function
-#' computed using an ordinary least squares influence function that adjusts for censoring using
+#' computed using an ordinary least squares influence function. The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
 #' @param run.WLS  a logical indicator. If TRUE, then the output includes the estimated distribution function
-#' computed using a weighted least squares influence function that adjusts for censoring using
+#' computed using a weighted least squares influence function. The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
 #' @param run.EFF  a logical indicator. If TRUE, then the output includes the estimated distribution function
 #' computed using the efficient influence function based on Hilbert space projection theory results.
 #' The estimator adjusts for censoring using
 #' inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
-#' and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.
+#' and imputation (IMP). See details in Wang et al (2012). These estimators do not
+#' adjust for covariates.
 #' @param run.EMPAVA logical indicator. If TRUE, we compute the distribution function for the mixture data
 #' based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
-#' from isotone regression to yield a non-negative and monotone estimator.
+#' from isotone regression to yield a non-negative and monotone estimator. This estimator does not adjust
+#' for covariates.  See details in Qing et al (2014).
 #'
 #' @references
 #' Garcia, T.P. and Parast, L. (2020). Dynamic landmark prediction for mixture data. Biostatistics,  doi:10.1093/biostatistics/kxz052.
@@ -1924,9 +2088,11 @@ stride.nocovariates <- function(n,q,x,delta,
     out <- NULL
 
     Fest <- array(0,dim=c(p,1),dimnames=list(paste0("p",1:p),"EMPAVA"))
+    out$Fest <- Fest
     out.empava <- stride.empava(n,q,x,delta,timeval,p,tol.level=0.00001, count.max = 100)
 
     ## add estimation of EM-PAVA
+
     out$Fest[,"EMPAVA"] <- out.empava$Fest
 
   }

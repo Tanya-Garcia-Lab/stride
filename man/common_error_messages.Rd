@@ -21,6 +21,7 @@ common_error_messages(
   run.OLS,
   run.WLS,
   run.EFF,
+  run.EMPAVA,
   tval,
   tval0,
   z.use,
@@ -89,6 +90,10 @@ computed using the efficient influence function based on Hilbert space projectio
 The estimator adjusts for censoring using
 inverse probability weighting (IPW), augmented inverse probability weighting (AIPW),
 and imputation (IMP). See details in Wang et al (2012). These estimators do not include covariates nor dynamic landmarking.}
+
+\item{run.EMPAVA}{logical indicator. If TRUE, we compute the distribution function for the mixture data
+based on an expectation-maximization (EM) algorithm that uses the pool adjacent violators algorithm (PAVA)
+from isotone regression to yield a non-negative and monotone estimator.}
 
 \item{tval}{numeric vector of time points at which the distribution function is evaluated, all values must
 be non-negative.}
