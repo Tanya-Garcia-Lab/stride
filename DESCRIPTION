@@ -1,7 +1,11 @@
 Package: stride
 Title: STRIDE: Robust powerful mixture models 
 Version: 0.1.0
-Author: Tanya P. Garcia
+Authors@R: 
+  person(given = "Tanya",
+           family = "Garcia",
+           role = c("aut", "cre"),
+           email = "tpgarcia16@gmail.com")
 Maintainer: Tanya P. Garcia <tpgarcia16@gmail.com>
 Description: Nonparametric prediction of survival outcomes when survival data are 
   collected from multiple populations of interest, but we do not know from which population each observation came. 
