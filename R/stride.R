@@ -1,6 +1,6 @@
 #' stride package
 #'
-#' This package provides functions to nonparametrically estimate survival models
+#' This package provides functions to nonparametrically estimate survival curves
 #' from mixture data. Mixture data is when data are collected from multiple populations
 #' of interest, but no information is provided as to which population each observation belongs.
 #' The functions are for nonparametric prediction models that incorporate covariates and landmarking.
